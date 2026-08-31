@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <title>Automation Nodes — B-roll</title>
+    <script src="vendor/gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: #04050a; }
+      #root {
+        position: relative; width: 1080px; height: 1920px; overflow: hidden; background: #04050a;
+      }
+      .clip { position: absolute; inset: 0; overflow: hidden; }
+
+      /* ---------- ambient environment ---------- */
+      #bg-clip {
+        background:
+          radial-gradient(46% 26% at 66% 36%, rgba(56, 189, 248, 0.20), transparent 70%),
+          radial-gradient(52% 30% at 30% 72%, rgba(139, 92, 246, 0.16), transparent 72%),
+          radial-gradient(80% 55% at 50% 50%, rgba(12, 18, 40, 0.9), transparent 78%),
+          #04050a;
+      }
+      /* soft-box key light, upper right */
+      #softbox {
+        position: absolute; width: 1500px; height: 1500px; left: 240px; top: -420px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(150, 200, 255, 0.13), transparent 62%);
+        filter: blur(30px);
+      }
+
+      /* ---------- depth stack ---------- */
+      #stage { position: absolute; inset: 0; perspective: 1500px; }
+      #camera { position: absolute; inset: 0; transform-origin: 700px 720px; }
+      #tilt { position: absolute; inset: 0; transform-style: preserve-3d; }
+      .layer { position: absolute; inset: 0; }
+
+      #l-far  { filter: blur(7px);  opacity: 0.55; }
+      #l-mid  { filter: blur(3px);  opacity: 0.72; }
+      #l-near { filter: blur(17px); opacity: 0.42; }
+
+      /* ---------- nodes ---------- */
+      .node {
+        position: absolute; border-radius: 26px;
+        background: linear-gradient(158deg, rgba(28,40,72,0.96) 0%, rgba(12,18,36,0.96) 100%);
+        border: 2px solid rgba(120, 190, 255, 0.42);
+        box-shadow:
+          0 0 0 1px rgba(255,255,255,0.05) inset,
+          0 0 34px rgba(56, 189, 248, 0.34),
+          0 22px 50px rgba(0,0,0,0.6);
+      }
+      .node::after {
+        content: ""; position: absolute; inset: 12px; border-radius: 16px;
+        border: 1.5px solid rgba(167, 139, 250, 0.24);
+      }
+      .node .dot {
+        position: absolute; left: 50%; top: 50%; width: 16px; height: 16px; margin: -8px 0 0 -8px;
+        border-radius: 50%; background: #7dd3fc;
+        box-shadow: 0 0 22px rgba(125, 211, 252, 0.95), 0 0 46px rgba(56, 189, 248, 0.6);
+      }
+      .node.is-violet { border-color: rgba(167, 139, 250, 0.5); box-shadow: 0 0 0 1px rgba(255,255,255,0.05) inset, 0 0 34px rgba(139, 92, 246, 0.34), 0 22px 50px rgba(0,0,0,0.6); }
+      .node.is-violet .dot { background: #c4b5fd; box-shadow: 0 0 22px rgba(196,181,253,0.95), 0 0 46px rgba(139,92,246,0.6); }
+
+      /* the hero core */
+      #core {
+        position: absolute; left: 580px; top: 600px; width: 240px; height: 240px; border-radius: 40px;
+        background: linear-gradient(158deg, rgba(34,52,96,0.98) 0%, rgba(10,16,34,0.98) 100%);
+        border: 3px solid rgba(150, 210, 255, 0.6);
+        box-shadow:
+          0 0 0 1px rgba(255,255,255,0.07) inset,
+          0 0 70px rgba(56, 189, 248, 0.5),
+          0 0 150px rgba(99, 102, 241, 0.34),
+          0 30px 70px rgba(0,0,0,0.65);
+      }
+      #core::after {
+        content: ""; position: absolute; inset: 22px; border-radius: 26px;
+        border: 2px solid rgba(167, 139, 250, 0.35);
+      }
+      #core-ring {
+        position: absolute; left: 50%; top: 50%; width: 320px; height: 320px; margin: -160px 0 0 -160px;
+        border-radius: 50%; border: 2px solid rgba(125, 211, 252, 0.45); opacity: 0;
+      }
+      #core-glow {
+        position: absolute; left: 50%; top: 50%; width: 96px; height: 96px; margin: -48px 0 0 -48px;
+        border-radius: 50%; background: radial-gradient(circle, #e0f2fe 0%, #38bdf8 42%, transparent 70%);
+        box-shadow: 0 0 60px rgba(56,189,248,0.9), 0 0 140px rgba(99,102,241,0.6);
+      }
+
+      /* ---------- connectors + travelling light ---------- */
+      .wire { fill: none; stroke: rgba(125, 211, 252, 0.4); stroke-width: 3; stroke-linecap: round; }
+      .wire.is-violet { stroke: rgba(167, 139, 250, 0.38); }
+      .trail {
+        fill: none; stroke: #bae6fd; stroke-width: 9; stroke-linecap: round;
+        filter: drop-shadow(0 0 16px rgba(125, 211, 252, 1));
+      }
+      .trail.is-violet { stroke: #ddd6fe; filter: drop-shadow(0 0 12px rgba(167, 139, 250, 0.95)); }
+
+      /* ---------- particles ---------- */
+      .p { position: absolute; border-radius: 50%; background: #cfe9ff; }
+      .bokeh {
+        position: absolute; border-radius: 50%;
+        background: radial-gradient(circle, rgba(190, 230, 255, 0.9), rgba(120, 170, 255, 0.15) 60%, transparent 72%);
+      }
+
+      /* ---------- grade ---------- */
+      #grade-clip { pointer-events: none; }
+      #vignette {
+        position: absolute; inset: 0;
+        background: radial-gradient(72% 52% at 60% 44%, transparent 42%, rgba(2, 3, 8, 0.82) 100%);
+      }
+      #bloom {
+        position: absolute; inset: 0; mix-blend-mode: screen; opacity: 0.5;
+        background: radial-gradient(38% 22% at 65% 38%, rgba(80, 170, 255, 0.28), transparent 72%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="50"
+         data-width="1080" data-height="1920" data-fps="30">
+
+      <div id="bg-clip" class="clip" data-start="0" data-duration="50" data-track-index="0">
+        <div id="softbox" data-layout-allow-overflow></div>
+      </div>
+
+      <div id="field-clip" class="clip" data-start="0" data-duration="50" data-track-index="1"
+           data-layout-allow-overflow>
+        <div id="stage">
+          <div id="camera">
+            <div id="tilt">
+
+              <!-- far dust -->
+              <div id="l-far" class="layer"></div>
+
+              <!-- secondary cluster, kept dim so the lower-left stays open -->
+              <div id="l-mid" class="layer">
+                <svg viewBox="0 0 1080 1920" style="position:absolute; inset:0; overflow:visible;">
+                  <path class="wire is-violet" d="M 120 300 C 220 380 260 470 200 560" />
+                  <path class="wire is-violet" d="M 200 560 C 150 660 170 720 250 780" />
+                </svg>
+                <div class="node is-violet" style="left:60px; top:250px; width:110px; height:110px;"><span class="dot"></span></div>
+                <div class="node is-violet" style="left:150px; top:510px; width:96px; height:96px;"><span class="dot"></span></div>
+                <div class="node is-violet" style="left:205px; top:735px; width:86px; height:86px;"><span class="dot"></span></div>
+              </div>
+
+              <!-- hero cluster -->
+              <div id="l-hero" class="layer">
+                <svg id="wires" viewBox="0 0 1080 1920" style="position:absolute; inset:0; overflow:visible;">
+                  <path id="w1" class="wire" d="M 700 720 C 620 640 500 600 415 570" />
+                  <path id="w2" class="wire" d="M 700 720 C 800 660 900 560 960 480" />
+                  <path id="w3" class="wire is-violet" d="M 700 720 C 830 800 940 880 1000 1010" />
+                  <path id="w4" class="wire" d="M 700 720 C 690 880 660 1000 610 1140" />
+                  <path id="w5" class="wire is-violet" d="M 700 720 C 560 790 420 830 315 920" />
+
+                  <path id="t1" class="trail" d="M 700 720 C 620 640 500 600 415 570" />
+                  <path id="t2" class="trail" d="M 700 720 C 800 660 900 560 960 480" />
+                  <path id="t3" class="trail is-violet" d="M 700 720 C 830 800 940 880 1000 1010" />
+                  <path id="t4" class="trail" d="M 700 720 C 690 880 660 1000 610 1140" />
+                  <path id="t5" class="trail is-violet" d="M 700 720 C 560 790 420 830 315 920" />
+                </svg>
+
+                <div id="core">
+                  <div id="core-ring"></div>
+                  <div id="core-glow"></div>
+                </div>
+
+                <div class="node sat" id="s1" style="left:330px; top:490px; width:170px; height:170px;"><span class="dot"></span></div>
+                <div class="node sat" id="s2" style="left:890px; top:400px; width:150px; height:150px;"><span class="dot"></span></div>
+                <div class="node sat is-violet" id="s3" style="left:930px; top:940px; width:158px; height:158px;"><span class="dot"></span></div>
+                <div class="node sat" id="s4" style="left:530px; top:1070px; width:164px; height:164px;"><span class="dot"></span></div>
+                <div class="node sat is-violet" id="s5" style="left:235px; top:845px; width:148px; height:148px;"><span class="dot"></span></div>
+              </div>
+
+              <!-- foreground bokeh sells the shallow depth of field -->
+              <div id="l-near" class="layer"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="grade-clip" class="clip" data-start="0" data-duration="50" data-track-index="2">
+        <div id="bloom"></div>
+        <div id="vignette"></div>
+      </div>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      var tl = gsap.timeline({ paused: true });
+
+      /* deterministic placement — seeded, so every render is identical */
+      function mulberry32(a) {
+        return function () {
+          a |= 0; a = (a + 0x6d2b79f5) | 0;
+          var t = Math.imul(a ^ (a >>> 15), 1 | a);
+          t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+          return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+        };
+      }
+
+      /* ---- far dust ---- */
+      var rnd = mulberry32(20260831);
+      var far = document.getElementById("l-far");
+      var dust = [];
+      for (var i = 0; i < 74; i++) {
+        var d = document.createElement("div");
+        d.className = "p";
+        var size = 3 + rnd() * 6;
+        d.style.width = size + "px";
+        d.style.height = size + "px";
+        d.style.left = (rnd() * 1080).toFixed(1) + "px";
+        d.style.top = (rnd() * 1920).toFixed(1) + "px";
+        d.style.opacity = (0.18 + rnd() * 0.5).toFixed(2);
+        far.appendChild(d);
+        dust.push(d);
+      }
+
+      /* ---- foreground bokeh ---- */
+      var near = document.getElementById("l-near");
+      var bokeh = [];
+      for (var j = 0; j < 11; j++) {
+        var b = document.createElement("div");
+        b.className = "bokeh";
+        var bs = 60 + rnd() * 130;
+        b.style.width = bs + "px";
+        b.style.height = bs + "px";
+        b.style.left = (rnd() * 1080 - 60).toFixed(1) + "px";
+        b.style.top = (rnd() * 1920 - 60).toFixed(1) + "px";
+        b.style.opacity = (0.25 + rnd() * 0.45).toFixed(2);
+        near.appendChild(b);
+        bokeh.push(b);
+      }
+
+      /* ---- low camera angle: the field leans back a touch ---- */
+      gsap.set("#tilt", { rotateX: 7, transformPerspective: 1500, transformOrigin: "50% 62%" });
+
+      /* ---- slow push-in toward the core, the whole 50s ---- */
+      gsap.set("#camera", { scale: 1, x: 0, y: 0 });
+      tl.to("#camera", { scale: 1.52, duration: 50, ease: "power1.inOut" }, 0);
+      tl.to("#camera", { x: -26, y: 18, duration: 25, ease: "sine.inOut", yoyo: true, repeat: 1 }, 0);
+
+      /* parallax: layers drift at their own rate */
+      tl.to("#l-far",  { y: 46, duration: 25, ease: "sine.inOut", yoyo: true, repeat: 1 }, 0);
+      tl.to("#l-mid",  { y: -30, duration: 25, ease: "sine.inOut", yoyo: true, repeat: 1 }, 0);
+      tl.to("#l-near", { y: 74, x: -40, duration: 25, ease: "sine.inOut", yoyo: true, repeat: 1 }, 0);
+
+      /* ---- everything breathes ---- */
+      var sats = ["#s1", "#s2", "#s3", "#s4", "#s5"];
+      sats.forEach(function (sel, k) {
+        gsap.set(sel, { transformOrigin: "50% 50%" });
+        var per = 9 + k * 1.3;                       // each satellite on its own clock
+        var reps = Math.max(1, Math.round(50 / per) - 1);
+        tl.to(sel, {
+          y: k % 2 === 0 ? -18 : 16,
+          x: k % 3 === 0 ? 10 : -8,
+          duration: per / 2, ease: "sine.inOut", yoyo: true, repeat: reps * 2 + 1,
+        }, k * 0.6);
+      });
+
+      gsap.set("#core", { transformOrigin: "50% 50%" });
+      tl.to("#core", { y: -12, duration: 6.25, ease: "sine.inOut", yoyo: true, repeat: 7 }, 0);
+      tl.to("#core-glow", { scale: 1.18, opacity: 0.86, duration: 3.125, ease: "sine.inOut", yoyo: true, repeat: 15 }, 0);
+
+      /* the core fires a ring every ~8s */
+      gsap.set("#core-ring", { transformOrigin: "50% 50%" });
+      for (var r = 0; r < 6; r++) {
+        var at = 2.2 + r * 8;
+        tl.fromTo("#core-ring",
+          { scale: 0.45, opacity: 0.55 },
+          { scale: 1.9, opacity: 0, duration: 3.2, ease: "power2.out",
+            immediateRender: r === 0, overwrite: "auto" }, at);
+      }
+
+      /* ---- light trails running the wires ---- */
+      function runTrail(sel, start, dur, gap, passes) {
+        var el = document.querySelector(sel);
+        var len = el.getTotalLength();
+        gsap.set(el, { strokeDasharray: "190 " + len, strokeDashoffset: 190, opacity: 0 });
+        for (var p = 0; p < passes; p++) {
+          var at = start + p * (dur + gap);
+          if (at + dur > 50) break;
+          tl.set(el, { opacity: 1 }, at);
+          tl.fromTo(el, { strokeDashoffset: 190 },
+            { strokeDashoffset: -len, duration: dur, ease: "sine.inOut", overwrite: "auto" }, at);
+          tl.set(el, { opacity: 0 }, at + dur);
+        }
+      }
+      runTrail("#t1", 0.8, 2.6, 3.6, 9);
+      runTrail("#t2", 2.0, 2.4, 4.1, 8);
+      runTrail("#t3", 3.2, 2.8, 3.9, 8);
+      runTrail("#t4", 4.4, 2.5, 4.4, 8);
+      runTrail("#t5", 5.6, 2.7, 4.2, 8);
+
+      /* ---- dust drifts up and twinkles ---- */
+      dust.forEach(function (el, k) {
+        var drift = 90 + (k % 7) * 26;
+        tl.to(el, { y: -drift, duration: 25, ease: "none", yoyo: true, repeat: 1, overwrite: "auto" }, 0);
+        if (k % 3 === 0) {
+          tl.to(el, { opacity: 0.08, duration: 4.16, ease: "sine.inOut", yoyo: true, repeat: 11 }, (k % 5) * 0.7);
+        }
+      });
+
+      /* ---- bokeh floats across the lens ---- */
+      bokeh.forEach(function (el, k) {
+        tl.to(el, {
+          y: k % 2 === 0 ? -120 : 96,
+          x: k % 3 === 0 ? 70 : -58,
+          duration: 25, ease: "sine.inOut", yoyo: true, repeat: 1,
+        }, 0);
+      });
+
+      /* ---- the grade breathes with the push-in ---- */
+      tl.to("#bloom", { opacity: 0.72, duration: 25, ease: "sine.inOut", yoyo: true, repeat: 1 }, 0);
+
+      tl.seek(0);
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>
