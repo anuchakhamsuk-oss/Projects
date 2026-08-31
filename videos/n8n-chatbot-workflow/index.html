@@ -361,6 +361,32 @@
         <div id="end-line-2">24 ชั่วโมง</div>
         <div id="end-line-3">ออกแบบ workflow ด้วย n8n</div>
       </div>
+
+      <!-- ================= SFX ================= -->
+      <!-- node pop-ins -->
+      <audio id="sfx-pop-a" src=".media/audio/sfx/sfx_001.mp3" data-start="0.4" data-duration="0.72" data-volume="0.3" data-track-index="10"></audio>
+      <audio id="sfx-pop-b" src=".media/audio/sfx/sfx_001.mp3" data-start="1.35" data-duration="0.72" data-volume="0.32" data-track-index="10"></audio>
+      <audio id="sfx-pop-c" src=".media/audio/sfx/sfx_001.mp3" data-start="3.45" data-duration="0.72" data-volume="0.3" data-track-index="10"></audio>
+
+      <!-- connectors drawing -->
+      <audio id="sfx-wh-ab" src=".media/audio/sfx/sfx_002.mp3" data-start="0.9" data-duration="0.57" data-volume="0.2" data-track-index="11"></audio>
+      <audio id="sfx-wh-sub" src=".media/audio/sfx/sfx_002.mp3" data-start="1.9" data-duration="0.5" data-volume="0.16" data-track-index="11"></audio>
+      <audio id="sfx-wh-bc" src=".media/audio/sfx/sfx_002.mp3" data-start="2.9" data-duration="0.57" data-volume="0.2" data-track-index="11"></audio>
+
+      <!-- sub-node blips -->
+      <audio id="sfx-click-1" src=".media/audio/sfx/sfx_004.mp3" data-start="2.15" data-duration="0.37" data-volume="0.2" data-track-index="12"></audio>
+      <audio id="sfx-click-2" src=".media/audio/sfx/sfx_004.mp3" data-start="2.3" data-duration="0.37" data-volume="0.2" data-track-index="13"></audio>
+      <audio id="sfx-click-3" src=".media/audio/sfx/sfx_004.mp3" data-start="2.45" data-duration="0.37" data-volume="0.2" data-track-index="14"></audio>
+
+      <!-- data packets travelling + arrival pings -->
+      <audio id="sfx-flow-1" src=".media/audio/sfx/sfx_002.mp3" data-start="4.2" data-duration="0.57" data-volume="0.26" data-track-index="11"></audio>
+      <audio id="sfx-ping-1" src=".media/audio/sfx/sfx_005.mp3" data-start="5" data-duration="1" data-volume="0.3" data-track-index="10"></audio>
+      <audio id="sfx-flow-2" src=".media/audio/sfx/sfx_002.mp3" data-start="5.5" data-duration="0.57" data-volume="0.26" data-track-index="11"></audio>
+      <audio id="sfx-ping-2" src=".media/audio/sfx/sfx_005.mp3" data-start="6.35" data-duration="1" data-volume="0.3" data-track-index="12"></audio>
+
+      <!-- reply bubble + end card -->
+      <audio id="sfx-notif" src=".media/audio/sfx/sfx_008.mp3" data-start="6.6" data-duration="1.6" data-volume="0.34" data-track-index="11"></audio>
+      <audio id="sfx-impact" src=".media/audio/sfx/sfx_007.mp3" data-start="7.9" data-duration="2.1" data-volume="0.42" data-track-index="13"></audio>
     </div>
 
     <script>
@@ -473,6 +499,14 @@
         { y: 18, opacity: 0 },
         { y: 0, opacity: 1, duration: 0.4, ease: "power3.out" },
         8.7,
+      );
+
+      /* end-card impact fades out so the tail doesn't hard-cut at 10s */
+      tl.fromTo(
+        "#sfx-impact",
+        { volume: 0.42 },
+        { volume: 0, duration: 1.0, ease: "power2.in" },
+        9.0,
       );
 
       tl.seek(0);
