@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <title>n8n Chatbot — Fastwork Ad</title>
+    <script src="vendor/gsap.min.js"></script>
+    <style>
+      @font-face { font-family: "Kanit"; font-weight: 400; font-style: normal; src: url("assets/fonts/kanit-400.ttf") format("truetype"); }
+      @font-face { font-family: "Kanit"; font-weight: 600; font-style: normal; src: url("assets/fonts/kanit-600.ttf") format("truetype"); }
+      @font-face { font-family: "Kanit"; font-weight: 700; font-style: normal; src: url("assets/fonts/kanit-700.ttf") format("truetype"); }
+      @font-face { font-family: "Kanit"; font-weight: 800; font-style: normal; src: url("assets/fonts/kanit-800.ttf") format("truetype"); }
+
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: #08080b; }
+      body { font-family: "Kanit", sans-serif; }
+      #root {
+        position: relative; width: 1080px; height: 1920px; overflow: hidden;
+        background: #08080b; color: #ffffff;
+      }
+      .clip { position: absolute; inset: 0; overflow: hidden; }
+
+      /* ---------- background ---------- */
+      #bg-clip {
+        background:
+          radial-gradient(70% 42% at 50% 40%, rgba(255, 45, 85, 0.15), transparent 72%),
+          radial-gradient(52% 30% at 50% 86%, rgba(180, 12, 50, 0.11), transparent 74%), #08080b;
+      }
+      #bg-stars {
+        position: absolute; inset: 0;
+        background-image:
+          radial-gradient(rgba(255,255,255,0.45) 1.5px, transparent 1.5px),
+          radial-gradient(rgba(255,255,255,0.25) 1.5px, transparent 1.5px);
+        background-size: 250px 250px, 165px 165px;
+        background-position: 0 0, 85px 110px;
+        opacity: 0.5;
+      }
+
+      /* ---------- camera + world ---------- */
+      #camera { position: absolute; left: 0; top: 0; width: 2600px; height: 7600px; transform-origin: 0 0; }
+      #world-svg { position: absolute; left: 0; top: 0; width: 2600px; height: 7600px; overflow: visible; }
+
+      .conn { fill: none; stroke: #ffffff; stroke-width: 13; stroke-linecap: round;
+              filter: drop-shadow(0 0 14px rgba(255,255,255,0.7)); }
+      .conn.is-sub { stroke-width: 8; opacity: 0.7; }
+      .flow { fill: none; stroke: #ffd0c6; stroke-width: 18; stroke-linecap: round; opacity: 0; }
+
+      /* world-space blocks */
+      .wnode { position: absolute; opacity: 0; }
+      .wtext { position: absolute; opacity: 0; text-align: center; }
+
+      .pill {
+        position: absolute; display: flex; align-items: center; justify-content: center;
+        border-radius: 999px;
+        background: linear-gradient(180deg, #ff3b63 0%, #e2093c 100%);
+        box-shadow: 0 0 0 3px rgba(255,255,255,0.18) inset, 0 0 55px rgba(255,45,85,0.6), 0 18px 44px rgba(0,0,0,0.55);
+        color: #fff; font-weight: 700; white-space: nowrap; opacity: 0;
+      }
+      .pill.is-ghost {
+        background: linear-gradient(180deg, #3a3d47 0%, #23252c 100%);
+        box-shadow: 0 0 0 3px rgba(255,255,255,0.1) inset, 0 14px 34px rgba(0,0,0,0.55);
+        color: #e6e8ee; font-weight: 600;
+      }
+
+      .big { font-size: 128px; font-weight: 800; line-height: 1.24; }
+      .mid { font-size: 84px; font-weight: 800; line-height: 1.28; }
+      .small { font-size: 46px; font-weight: 600; color: #98a0ad; }
+      .accent { color: #ff4d70; }
+
+      /* chat mock */
+      .chat { position: absolute; width: 880px; opacity: 0; }
+      .bub {
+        display: inline-block; max-width: 780px; padding: 26px 38px; border-radius: 34px;
+        background: #1b1e26; color: #eef0f5; font-size: 44px; font-weight: 600;
+        box-shadow: 0 12px 30px rgba(0,0,0,0.5); margin-bottom: 22px;
+      }
+      .bub.is-me { background: linear-gradient(180deg,#ff3b63,#e2093c); color: #fff; }
+      .stamp { font-size: 34px; font-weight: 600; color: #6c7180; }
+
+      /* price rows */
+      .price {
+        position: absolute; display: flex; align-items: center; justify-content: space-between;
+        width: 1000px; padding: 30px 46px; border-radius: 28px;
+        background: rgba(255,255,255,0.055); border: 3px solid rgba(255,255,255,0.12);
+        font-size: 50px; font-weight: 700; opacity: 0;
+      }
+      .price b { color: #ff5c7c; font-weight: 800; }
+
+      /* ---------- punch-through scenes ---------- */
+      .react {
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        gap: 34px; padding: 0 80px; opacity: 0;
+        background:
+          radial-gradient(60% 40% at 50% 30%, rgba(255,80,110,0.32), transparent 70%),
+          linear-gradient(160deg, #a4082f 0%, #6d0a1f 55%, #3d0512 100%);
+      }
+      .react::after {
+        content: ""; position: absolute; inset: 0; pointer-events: none;
+        background-image:
+          repeating-linear-gradient(114deg, rgba(255,255,255,0.05) 0px, rgba(255,255,255,0) 3px, rgba(0,0,0,0.06) 7px, rgba(255,255,255,0) 13px),
+          repeating-linear-gradient(18deg, rgba(255,255,255,0.04) 0px, rgba(0,0,0,0.05) 6px, rgba(255,255,255,0) 14px);
+      }
+      .react .r-head { position: relative; font-size: 42px; font-weight: 600; color: rgba(255,255,255,0.72); }
+      .react .r-main { position: relative; font-size: 100px; font-weight: 800; line-height: 1.26; text-align: center;
+                       text-shadow: 0 14px 40px rgba(0,0,0,0.5); }
+      .react .r-sub  { position: relative; font-size: 44px; font-weight: 600; color: #ffd9df; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="55"
+         data-width="1080" data-height="1920" data-fps="30">
+
+      <div id="bg-clip" class="clip" data-start="0" data-duration="55" data-track-index="0">
+        <div id="bg-stars"></div>
+      </div>
+
+      <div id="world-clip" class="clip" data-start="0" data-duration="55" data-track-index="1"
+           data-layout-allow-occlusion>
+        <div id="camera" data-layout-allow-overflow>
+          <svg id="world-svg" viewBox="0 0 2600 7600">
+            <path id="conn-ab" class="conn" d="M 900 3720 C 900 3960 1700 4000 1700 4180" />
+            <path id="conn-s1" class="conn is-sub" d="M 1700 4350 C 1700 4640 1150 4600 1150 4830" />
+            <path id="conn-s2" class="conn is-sub" d="M 1700 4350 L 1700 4930" />
+            <path id="conn-s3" class="conn is-sub" d="M 1700 4350 C 1700 4640 2250 4600 2250 4830" />
+            <path id="conn-bc" class="conn" d="M 1400 4270 C 800 4380 700 5300 1000 5610" />
+            <path id="flow-ab" class="flow" d="M 900 3720 C 900 3960 1700 4000 1700 4180" />
+            <path id="flow-bc" class="flow" d="M 1400 4270 C 800 4380 700 5300 1000 5610" />
+          </svg>
+
+          <!-- A · HOOK -->
+          <div id="hook-1" class="wtext big" style="left:300px; top:560px; width:2000px;">ลูกค้าทักมา</div>
+          <div id="hook-2" class="wtext big accent" style="left:300px; top:720px; width:2000px;">ตอนตี 2</div>
+          <div id="chat-1" class="chat" style="left:860px; top:1010px;">
+            <div class="bub">สนใจสินค้าค่ะ ยังมีของไหมคะ</div>
+          </div>
+          <div id="chat-2" class="chat" style="left:860px; top:1160px;">
+            <div class="bub">ราคาเท่าไหร่คะ</div>
+          </div>
+          <div id="chat-3" class="chat" style="left:860px; top:1320px;">
+            <div class="stamp">อ่านแล้ว · ยังไม่มีใครตอบ</div>
+          </div>
+
+          <!-- B · PROBLEM -->
+          <div id="prob-1" class="wtext mid" style="left:300px; top:1980px; width:2000px;">กว่าจะเห็นตอนเช้า</div>
+          <div id="prob-2" class="wtext big accent" style="left:300px; top:2120px; width:2000px;">เขาไปร้านอื่นแล้ว</div>
+          <div id="pill-lost" class="pill is-ghost" style="left:1000px; top:2560px; width:600px; height:160px; font-size:52px;">ลูกค้าหลุด</div>
+
+          <!-- C · SOLUTION HEAD -->
+          <div id="sol-1" class="wtext small" style="left:300px; top:3020px; width:2000px;">ทางแก้ที่ไม่ต้องจ้างแอดมินเพิ่ม</div>
+          <div id="sol-2" class="wtext big" style="left:300px; top:3110px; width:2000px;">ให้ระบบตอบแทน</div>
+
+          <!-- D · WORKFLOW -->
+          <div id="pill-a" class="pill" style="left:600px; top:3560px; width:600px; height:170px; font-size:58px;">รับข้อความ</div>
+          <div id="pill-b" class="pill" style="left:1380px; top:4180px; width:640px; height:190px; font-size:66px;">AI Agent</div>
+          <div id="pill-s1" class="pill is-ghost" style="left:930px; top:4830px; width:440px; height:140px; font-size:44px;">Chat Model</div>
+          <div id="pill-s2" class="pill is-ghost" style="left:1500px; top:4930px; width:400px; height:140px; font-size:44px;">Memory</div>
+          <div id="pill-s3" class="pill is-ghost" style="left:2030px; top:4830px; width:440px; height:140px; font-size:44px;">ข้อมูลร้าน</div>
+          <div id="pill-c" class="pill" style="left:700px; top:5610px; width:600px; height:170px; font-size:56px;">ตอบกลับเอง</div>
+
+          <!-- E · PROOF -->
+          <div id="proof-head" class="wtext mid" style="left:300px; top:5980px; width:2000px;">เริ่มได้เลย</div>
+          <div id="price-1" class="price" style="left:800px; top:6220px;"><span>เริ่มต้น</span><b>฿3,000</b></div>
+          <div id="price-2" class="price" style="left:800px; top:6360px;"><span>มาตรฐาน</span><b>฿9,000</b></div>
+          <div id="price-3" class="price" style="left:800px; top:6500px;"><span>ครบวงจร</span><b>฿30,000</b></div>
+
+          <!-- F · CTA -->
+          <div id="cta-1" class="wtext mid" style="left:300px; top:6790px; width:2000px;">ทักมาคุยก่อนได้</div>
+          <div id="pill-cta" class="pill" style="left:750px; top:6970px; width:1100px; height:180px; font-size:56px;">Fastwork · Anuchakhamsuk</div>
+          <div id="cta-2" class="wtext small" style="left:300px; top:7190px; width:2000px;">รับทำระบบอัตโนมัติด้วย n8n</div>
+        </div>
+      </div>
+
+      <!-- punch-through 1 -->
+      <div id="react-1" class="clip react" data-start="10.4" data-duration="3.4" data-track-index="2">
+        <div class="r-head">ความจริงที่เจ็บ</div>
+        <div class="r-main">ตอบช้า<br />= เสียลูกค้า</div>
+        <div class="r-sub">ทุกคืน ทุกวันหยุด</div>
+      </div>
+
+      <!-- punch-through 2 -->
+      <div id="react-2" class="clip react" data-start="37.2" data-duration="4.4" data-track-index="3">
+        <div class="r-head">หลังติดตั้งระบบ</div>
+        <div class="r-main">ทักมาตอนตี 3<br />ก็ตอบได้</div>
+        <div class="r-sub">24 ชั่วโมง ไม่ต้องมีคนเฝ้า</div>
+      </div>
+
+      <!-- SFX -->
+      <audio id="sfx-hook" src=".media/audio/sfx/sfx_007.mp3" data-start="0.2" data-duration="2" data-volume="0.36" data-track-index="10"></audio>
+      <audio id="sfx-chat-1" src=".media/audio/sfx/sfx_008.mp3" data-start="1.7" data-duration="1.2" data-volume="0.3" data-track-index="11"></audio>
+      <audio id="sfx-chat-2" src=".media/audio/sfx/sfx_008.mp3" data-start="2.4" data-duration="1.2" data-volume="0.28" data-track-index="12"></audio>
+      <audio id="sfx-lost" src=".media/audio/sfx/sfx_004.mp3" data-start="8.2" data-duration="0.4" data-volume="0.26" data-track-index="11"></audio>
+      <audio id="sfx-punch-1" src=".media/audio/sfx/sfx_007.mp3" data-start="10.3" data-duration="2" data-volume="0.4" data-track-index="10"></audio>
+      <audio id="sfx-out-1" src=".media/audio/sfx/sfx_002.mp3" data-start="13.6" data-duration="0.57" data-volume="0.24" data-track-index="11"></audio>
+      <audio id="sfx-sol" src=".media/audio/sfx/sfx_005.mp3" data-start="15.4" data-duration="1" data-volume="0.26" data-track-index="12"></audio>
+      <audio id="sfx-pop-a" src=".media/audio/sfx/sfx_001.mp3" data-start="19" data-duration="0.72" data-volume="0.3" data-track-index="10"></audio>
+      <audio id="sfx-wh-ab" src=".media/audio/sfx/sfx_002.mp3" data-start="20.4" data-duration="0.57" data-volume="0.22" data-track-index="11"></audio>
+      <audio id="sfx-pop-b" src=".media/audio/sfx/sfx_001.mp3" data-start="23" data-duration="0.72" data-volume="0.32" data-track-index="10"></audio>
+      <audio id="sfx-click-1" src=".media/audio/sfx/sfx_004.mp3" data-start="25.4" data-duration="0.37" data-volume="0.22" data-track-index="12"></audio>
+      <audio id="sfx-click-2" src=".media/audio/sfx/sfx_004.mp3" data-start="25.8" data-duration="0.37" data-volume="0.22" data-track-index="13"></audio>
+      <audio id="sfx-click-3" src=".media/audio/sfx/sfx_004.mp3" data-start="26.2" data-duration="0.37" data-volume="0.22" data-track-index="14"></audio>
+      <audio id="sfx-wh-bc" src=".media/audio/sfx/sfx_002.mp3" data-start="28.6" data-duration="0.57" data-volume="0.22" data-track-index="11"></audio>
+      <audio id="sfx-pop-c" src=".media/audio/sfx/sfx_001.mp3" data-start="31" data-duration="0.72" data-volume="0.3" data-track-index="10"></audio>
+      <audio id="sfx-flow-1" src=".media/audio/sfx/sfx_002.mp3" data-start="32.4" data-duration="0.57" data-volume="0.26" data-track-index="12"></audio>
+      <audio id="sfx-flow-2" src=".media/audio/sfx/sfx_002.mp3" data-start="33.6" data-duration="0.57" data-volume="0.26" data-track-index="13"></audio>
+      <audio id="sfx-ping" src=".media/audio/sfx/sfx_005.mp3" data-start="34.6" data-duration="1" data-volume="0.3" data-track-index="11"></audio>
+      <audio id="sfx-punch-2" src=".media/audio/sfx/sfx_007.mp3" data-start="37.1" data-duration="2" data-volume="0.4" data-track-index="10"></audio>
+      <audio id="sfx-out-2" src=".media/audio/sfx/sfx_002.mp3" data-start="41.5" data-duration="0.57" data-volume="0.24" data-track-index="11"></audio>
+      <audio id="sfx-p1" src=".media/audio/sfx/sfx_001.mp3" data-start="44.6" data-duration="0.72" data-volume="0.26" data-track-index="12"></audio>
+      <audio id="sfx-p2" src=".media/audio/sfx/sfx_001.mp3" data-start="45.3" data-duration="0.72" data-volume="0.26" data-track-index="13"></audio>
+      <audio id="sfx-p3" src=".media/audio/sfx/sfx_001.mp3" data-start="46" data-duration="0.72" data-volume="0.26" data-track-index="14"></audio>
+      <audio id="sfx-cta" src=".media/audio/sfx/sfx_005.mp3" data-start="51" data-duration="1" data-volume="0.3" data-track-index="10"></audio>
+      <audio id="sfx-end" src=".media/audio/sfx/sfx_007.mp3" data-start="52.4" data-duration="2.12" data-volume="0.36" data-track-index="11"></audio>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      var tl = gsap.timeline({ paused: true });
+
+      /* ---- camera rig: screen = translate + scale * world (origin 0 0) ---- */
+      function cam(wx, wy, s) { return { x: 540 - wx * s, y: 960 - wy * s, scale: s }; }
+      function moveCam(pose, at, dur, ease) {
+        tl.to("#camera", Object.assign({}, pose, { duration: dur, ease: ease || "power2.inOut" }), at);
+      }
+      gsap.set("#camera", Object.assign({ transformOrigin: "0px 0px" }, cam(1300, 900, 1.0)));
+
+      function rise(sel, at, dur, dist) {
+        tl.fromTo(sel, { y: dist || 40, opacity: 0 },
+          { y: 0, opacity: 1, duration: dur || 0.5, ease: "power3.out" }, at);
+      }
+      function pop(sel, at, dur) {
+        gsap.set(sel, { transformOrigin: "50% 50%" });
+        tl.fromTo(sel, { scale: 0.55, opacity: 0 },
+          { scale: 1, opacity: 1, duration: dur || 0.5, ease: "back.out(1.9)" }, at);
+      }
+      function draw(sel, at, dur) {
+        var el = document.querySelector(sel), len = el.getTotalLength();
+        gsap.set(el, { strokeDasharray: len, strokeDashoffset: len });
+        tl.to(el, { strokeDashoffset: 0, duration: dur, ease: "power2.inOut", overwrite: "auto" }, at);
+      }
+      function packet(sel, at, dur) {
+        var el = document.querySelector(sel), len = el.getTotalLength();
+        gsap.set(el, { strokeDasharray: "120 " + len, strokeDashoffset: 120 });
+        tl.set(el, { opacity: 1 }, at);
+        tl.fromTo(el, { strokeDashoffset: 120 },
+          { strokeDashoffset: -len, duration: dur, ease: "power1.inOut", overwrite: "auto" }, at);
+        tl.set(el, { opacity: 0 }, at + dur);
+      }
+
+      /* ===== A · HOOK (0 - 3.5) ===== */
+      rise("#hook-1", 0.25, 0.5);
+      rise("#hook-2", 0.55, 0.5);
+      pop("#chat-1", 1.7, 0.45);
+      pop("#chat-2", 2.4, 0.45);
+      rise("#chat-3", 3.0, 0.45, 24);
+      moveCam(cam(1300, 1150, 1.0), 1.6, 2.2); // drift down over the chat
+
+      /* ===== B · PROBLEM (4 - 10.4) ===== */
+      moveCam(cam(1300, 2150, 0.95), 4.0, 1.6);
+      rise("#prob-1", 5.2, 0.5);
+      rise("#prob-2", 5.7, 0.6);
+      moveCam(cam(1300, 2640, 1.05), 7.4, 1.4);
+      pop("#pill-lost", 8.2, 0.5);
+
+      /* punch through the "lost customer" pill */
+      moveCam(cam(1300, 2640, 4.4), 9.6, 1.0, "power3.in");
+      tl.to("#react-1", { opacity: 1, duration: 0.26, ease: "power2.out" }, 10.5);
+      tl.set("#world-clip", { opacity: 0 }, 10.78);
+      rise("#react-1 .r-main", 10.8, 0.45);
+      rise("#react-1 .r-head", 11.1, 0.4, 20);
+      rise("#react-1 .r-sub", 11.35, 0.4, 20);
+
+      /* the hook + problem props have done their job — retire them while the
+         punch-through scene covers the frame, so the next beat lands clean */
+      tl.set(["#hook-1", "#hook-2", "#chat-1", "#chat-2", "#chat-3",
+              "#prob-1", "#prob-2", "#pill-lost"], { opacity: 0 }, 13.7);
+
+      /* ===== C · SOLUTION (13.6 - 17.5) ===== */
+      tl.set("#world-clip", { opacity: 1 }, 13.79);
+      tl.to("#react-1", { opacity: 0, duration: 0.18, ease: "power2.in" }, 13.6);
+      moveCam(cam(1300, 3150, 1.0), 13.6, 1.9, "power2.out");
+      rise("#sol-1", 15.3, 0.45, 24);
+      rise("#sol-2", 15.6, 0.55);
+
+      /* ===== D · WORKFLOW (17.5 - 37) ===== */
+      moveCam(cam(900, 3650, 1.15), 17.8, 1.6);
+      pop("#pill-a", 19.0, 0.5);
+      draw("#conn-ab", 20.3, 1.0);
+      moveCam(cam(1700, 4270, 1.05), 21.2, 1.9);
+      pop("#pill-b", 23.0, 0.55);
+
+      moveCam(cam(1700, 4780, 0.85), 24.6, 1.8);
+      draw("#conn-s1", 25.0, 0.6);
+      draw("#conn-s2", 25.4, 0.6);
+      draw("#conn-s3", 25.8, 0.6);
+      pop("#pill-s1", 25.4, 0.45);
+      pop("#pill-s2", 25.8, 0.45);
+      pop("#pill-s3", 26.2, 0.45);
+
+      moveCam(cam(1000, 5560, 1.0), 27.8, 2.0);
+      draw("#conn-bc", 28.5, 1.4);
+      pop("#pill-c", 31.0, 0.55);
+
+      /* pull back and run a real message through the whole workflow */
+      moveCam(cam(1450, 4650, 0.52), 32.0, 2.0, "power2.out");
+      packet("#flow-ab", 32.4, 1.1);
+      packet("#flow-bc", 33.6, 1.5);
+
+      /* punch through the reply node */
+      moveCam(cam(1000, 5700, 3.6), 36.2, 1.1, "power3.in");
+      tl.to("#react-2", { opacity: 1, duration: 0.26, ease: "power2.out" }, 37.3);
+      tl.set("#world-clip", { opacity: 0 }, 37.58);
+      rise("#react-2 .r-main", 37.6, 0.45);
+      rise("#react-2 .r-head", 37.9, 0.4, 20);
+      rise("#react-2 .r-sub", 38.15, 0.4, 20);
+
+      /* same for the workflow map before the proof beat */
+      tl.set(["#sol-1", "#sol-2", "#pill-a", "#pill-b", "#pill-s1", "#pill-s2",
+              "#pill-s3", "#pill-c", "#conn-ab", "#conn-s1", "#conn-s2",
+              "#conn-s3", "#conn-bc"], { opacity: 0 }, 41.6);
+
+      /* ===== E · PROOF (41.5 - 48.5) ===== */
+      tl.set("#world-clip", { opacity: 1 }, 41.69);
+      tl.to("#react-2", { opacity: 0, duration: 0.18, ease: "power2.in" }, 41.5);
+      moveCam(cam(1300, 6330, 0.95), 41.5, 2.2, "power2.out");
+      rise("#proof-head", 43.6, 0.5);
+      rise("#price-1", 44.6, 0.45, 30);
+      rise("#price-2", 45.3, 0.45, 30);
+      rise("#price-3", 46.0, 0.45, 30);
+
+      /* ===== F · CTA (48.5 - 55) ===== */
+      tl.to(["#proof-head", "#price-1", "#price-2", "#price-3"],
+        { opacity: 0, duration: 0.5, ease: "power2.in" }, 48.7);
+      moveCam(cam(1300, 6980, 0.95), 48.6, 2.0);
+      rise("#cta-1", 50.3, 0.5);
+      pop("#pill-cta", 51.0, 0.6);
+      rise("#cta-2", 51.9, 0.45, 24);
+      moveCam(cam(1300, 6960, 0.9), 52.4, 2.6, "power1.out"); // slow settle on the hold
+
+      tl.fromTo("#sfx-end", { volume: 0.36 }, { volume: 0, duration: 0.9, ease: "power2.in" }, 54.1);
+
+      tl.seek(0);
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>
