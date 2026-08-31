@@ -1,0 +1,44 @@
+{
+  "category": "kinetic-type",
+  "variant": "node-graph-diagram",
+  "duration_s": 10,
+  "fps": 30,
+  "canvas": { "w": 1080, "h": 1920, "aspect": "9:16" },
+  "style": "n8n canvas look — dark dotted grid, rounded node cards with thin borders, coral accent on the main flow, violet on the AI sub-nodes. Motion is the message: the workflow assembles node by node, then a data packet runs the path to prove the chatbot answers by itself.",
+  "palette": ["#0d0f14", "#1a1d26", "#2c3140", "#ff6d5a", "#a78bfa", "#f5f6f8", "#8b93a1"],
+  "font": "Kanit (local assets/fonts/*.ttf — Thai + Latin coverage)",
+  "beats": [0.4, 1.35, 1.9, 2.9, 4.2, 5.5, 6.6, 7.9],
+  "export": "mp4",
+  "asset_needs": [],
+  "content": {
+    "diagram": {
+      "main_flow": [
+        { "id": "node-a", "title": "รับข้อความ", "sub": "Chat Trigger", "center": [540, 400] },
+        { "id": "node-b", "title": "AI Agent", "sub": "ประมวลผลคำตอบ", "center": [540, 790] },
+        { "id": "node-c", "title": "ตอบกลับอัตโนมัติ", "sub": "Send Message", "center": [540, 1560] }
+      ],
+      "sub_nodes": [
+        { "id": "sub-1", "label": "Chat Model", "center": [300, 1120] },
+        { "id": "sub-2", "label": "Memory", "center": [540, 1120] },
+        { "id": "sub-3", "label": "Knowledge", "center": [780, 1120] }
+      ],
+      "connectors": [
+        { "id": "conn-ab", "from": "node-a", "to": "node-b", "kind": "main" },
+        { "id": "conn-bc", "from": "node-b", "to": "node-c", "kind": "main", "route": "right bow around the sub-node row" },
+        { "id": "conn-s1", "from": "node-b", "to": "sub-1", "kind": "sub" },
+        { "id": "conn-s2", "from": "node-b", "to": "sub-2", "kind": "sub" },
+        { "id": "conn-s3", "from": "node-b", "to": "sub-3", "kind": "sub" }
+      ]
+    },
+    "scenes": [
+      { "id": "assemble", "start": 0.0, "end": 4.0, "motion": "svg-path-draw connectors + back.out node pops, staggered top to bottom", "emotion": "build" },
+      { "id": "flow", "start": 4.2, "end": 7.6, "motion": "dash-travelling packet along each connector + node glow pulse on arrival; second faster pass to imply an always-on loop", "emotion": "proof" },
+      { "id": "reply", "start": 6.6, "end": 7.9, "motion": "chat bubble pops under the send node", "emotion": "payoff" },
+      { "id": "endcard", "start": 7.9, "end": 10.0, "motion": "overlay fade + word_reveal on two lines, hold still", "emotion": "resolve" }
+    ]
+  },
+  "block": null,
+  "customize": {
+    "note": "Hand-authored SVG node graph — no catalog block covers an n8n-style node canvas. Motion primitives borrowed from references/motion-vocabulary.md: scale_punch (node pop), svg-path-draw (connectors), glow (arrival pulse), fade_blur (end card)."
+  }
+}
