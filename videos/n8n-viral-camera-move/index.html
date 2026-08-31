@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <title>n8n — Camera Move Edit</title>
+    <script src="vendor/gsap.min.js"></script>
+    <style>
+      @font-face {
+        font-family: "Kanit";
+        font-weight: 400;
+        font-style: normal;
+        src: url("assets/fonts/kanit-400.ttf") format("truetype");
+      }
+      @font-face {
+        font-family: "Kanit";
+        font-weight: 600;
+        font-style: normal;
+        src: url("assets/fonts/kanit-600.ttf") format("truetype");
+      }
+      @font-face {
+        font-family: "Kanit";
+        font-weight: 700;
+        font-style: normal;
+        src: url("assets/fonts/kanit-700.ttf") format("truetype");
+      }
+      @font-face {
+        font-family: "Kanit";
+        font-weight: 800;
+        font-style: normal;
+        src: url("assets/fonts/kanit-800.ttf") format("truetype");
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        background: #08080b;
+      }
+      body {
+        font-family: "Kanit", sans-serif;
+      }
+      #root {
+        position: relative;
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        background: #08080b;
+        color: #ffffff;
+      }
+      .clip {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+      }
+
+      /* ---------- deep space background ---------- */
+      #bg-clip {
+        background:
+          radial-gradient(70% 45% at 50% 38%, rgba(255, 45, 85, 0.16), transparent 72%),
+          radial-gradient(55% 32% at 50% 84%, rgba(180, 12, 50, 0.12), transparent 74%), #08080b;
+      }
+      #bg-stars {
+        position: absolute;
+        inset: 0;
+        background-image:
+          radial-gradient(rgba(255, 255, 255, 0.5) 1.5px, transparent 1.5px),
+          radial-gradient(rgba(255, 255, 255, 0.28) 1.5px, transparent 1.5px);
+        background-size: 260px 260px, 170px 170px;
+        background-position: 0 0, 90px 120px;
+        opacity: 0.55;
+      }
+
+      /* ---------- the world + camera ---------- */
+      #camera {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 2400px;
+        height: 3600px;
+        transform-origin: 0 0;
+      }
+      #world-svg {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 2400px;
+        height: 3600px;
+        overflow: visible;
+      }
+      .conn {
+        fill: none;
+        stroke: #ffffff;
+        stroke-width: 13;
+        stroke-linecap: round;
+        filter: drop-shadow(0 0 14px rgba(255, 255, 255, 0.75));
+      }
+      .conn.is-sub {
+        stroke-width: 8;
+        opacity: 0.75;
+      }
+
+      .pill {
+        position: absolute;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 999px;
+        background: linear-gradient(180deg, #ff3b63 0%, #e2093c 100%);
+        box-shadow:
+          0 0 0 3px rgba(255, 255, 255, 0.18) inset,
+          0 0 55px rgba(255, 45, 85, 0.65),
+          0 18px 44px rgba(0, 0, 0, 0.55);
+        color: #ffffff;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
+        opacity: 0;
+      }
+      .pill.is-ghost {
+        background: linear-gradient(180deg, #3a3d47 0%, #23252c 100%);
+        box-shadow:
+          0 0 0 3px rgba(255, 255, 255, 0.1) inset,
+          0 14px 34px rgba(0, 0, 0, 0.55);
+        color: #e6e8ee;
+        font-weight: 600;
+      }
+
+      #pill-a {
+        left: 440px;
+        top: 520px;
+        width: 520px;
+        height: 160px;
+        font-size: 56px;
+      }
+      #pill-b {
+        left: 1200px;
+        top: 1160px;
+        width: 600px;
+        height: 190px;
+        font-size: 66px;
+      }
+      #pill-s1 {
+        left: 880px;
+        top: 1840px;
+        width: 400px;
+        height: 130px;
+        font-size: 42px;
+      }
+      #pill-s2 {
+        left: 1320px;
+        top: 1940px;
+        width: 360px;
+        height: 130px;
+        font-size: 42px;
+      }
+      #pill-s3 {
+        left: 1730px;
+        top: 1840px;
+        width: 400px;
+        height: 130px;
+        font-size: 42px;
+      }
+      #pill-c {
+        left: 640px;
+        top: 2670px;
+        width: 560px;
+        height: 165px;
+        font-size: 56px;
+      }
+
+      /* ---------- punch-through reaction scene ---------- */
+      #reaction-clip {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 40px;
+        padding: 0 80px;
+        background:
+          radial-gradient(60% 40% at 50% 30%, rgba(255, 80, 110, 0.35), transparent 70%),
+          radial-gradient(40% 30% at 20% 80%, rgba(0, 0, 0, 0.5), transparent 70%),
+          linear-gradient(160deg, #a4082f 0%, #6d0a1f 55%, #3d0512 100%);
+        opacity: 0;
+      }
+      #reaction-clip::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image:
+          repeating-linear-gradient(
+            114deg,
+            rgba(255, 255, 255, 0.05) 0px,
+            rgba(255, 255, 255, 0) 3px,
+            rgba(0, 0, 0, 0.06) 7px,
+            rgba(255, 255, 255, 0) 13px
+          ),
+          repeating-linear-gradient(
+            18deg,
+            rgba(255, 255, 255, 0.04) 0px,
+            rgba(0, 0, 0, 0.05) 6px,
+            rgba(255, 255, 255, 0) 14px
+          );
+        pointer-events: none;
+      }
+      #reaction-head {
+        position: relative;
+        font-size: 42px;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.72);
+      }
+      #reaction-main {
+        position: relative;
+        font-size: 96px;
+        font-weight: 800;
+        line-height: 1.28;
+        text-align: center;
+        text-shadow: 0 14px 40px rgba(0, 0, 0, 0.55);
+      }
+      #reaction-sub {
+        position: relative;
+        font-size: 44px;
+        font-weight: 600;
+        color: #ffd9df;
+      }
+
+      /* ---------- final title ---------- */
+      #title-clip {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-end;
+        padding-bottom: 210px;
+        gap: 16px;
+        background: linear-gradient(180deg, transparent 76%, rgba(8, 8, 11, 0.9) 91%);
+        opacity: 0;
+      }
+      #title-main {
+        font-size: 72px;
+        font-weight: 800;
+      }
+      #title-sub {
+        font-size: 38px;
+        font-weight: 600;
+        color: #ff5c7c;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="15"
+      data-width="1080"
+      data-height="1920"
+      data-fps="30"
+    >
+      <!-- background -->
+      <div id="bg-clip" class="clip" data-start="0" data-duration="15" data-track-index="0">
+        <div id="bg-stars"></div>
+      </div>
+
+      <!-- the world the camera flies over -->
+      <div
+        id="world-clip"
+        class="clip"
+        data-start="0"
+        data-duration="15"
+        data-track-index="1"
+        data-layout-allow-occlusion
+      >
+        <div id="camera" data-layout-allow-overflow>
+          <svg id="world-svg" viewBox="0 0 2400 3600">
+            <path id="conn-ab" class="conn" d="M 700 680 C 700 900 1500 940 1500 1160" />
+            <path id="conn-s1" class="conn is-sub" d="M 1500 1350 C 1500 1650 1080 1620 1080 1840" />
+            <path id="conn-s2" class="conn is-sub" d="M 1500 1350 L 1500 1940" />
+            <path id="conn-s3" class="conn is-sub" d="M 1500 1350 C 1500 1650 1930 1620 1930 1840" />
+            <path id="conn-bc" class="conn" d="M 1200 1255 C 700 1330 640 2200 920 2670" />
+          </svg>
+
+          <div id="pill-a" class="pill">Chat Trigger</div>
+          <div id="pill-b" class="pill">AI Agent</div>
+          <div id="pill-s1" class="pill is-ghost">Chat Model</div>
+          <div id="pill-s2" class="pill is-ghost">Memory</div>
+          <div id="pill-s3" class="pill is-ghost">Knowledge</div>
+          <div id="pill-c" class="pill">Send Reply</div>
+        </div>
+      </div>
+
+      <!-- punched-through reaction scene -->
+      <div id="reaction-clip" class="clip" data-start="8.5" data-duration="3.3" data-track-index="2">
+        <div id="reaction-head">ผลลัพธ์ที่ลูกค้าเห็น</div>
+        <div id="reaction-main">ทักมาตอนตี 3<br />ก็ตอบได้</div>
+        <div id="reaction-sub">ไม่ต้องมีคนเฝ้า</div>
+      </div>
+
+      <!-- final title over the wide reveal -->
+      <div id="title-clip" class="clip" data-start="13.2" data-duration="1.8" data-track-index="3">
+        <div id="title-main">ระบบแชทบอทอัตโนมัติ</div>
+        <div id="title-sub">สร้างด้วย n8n</div>
+      </div>
+
+    <!-- SFX -->
+    <audio id="sfx-pop-a" src=".media/audio/sfx/sfx_001.mp3" data-start="0.3" data-duration="0.72" data-volume="0.3" data-track-index="10"></audio>
+    <audio id="sfx-wh-ab" src=".media/audio/sfx/sfx_002.mp3" data-start="1.5" data-duration="0.57" data-volume="0.22" data-track-index="11"></audio>
+    <audio id="sfx-pop-b" src=".media/audio/sfx/sfx_001.mp3" data-start="2.9" data-duration="0.72" data-volume="0.32" data-track-index="10"></audio>
+    <audio id="sfx-click-1" src=".media/audio/sfx/sfx_004.mp3" data-start="4.85" data-duration="0.37" data-volume="0.22" data-track-index="12"></audio>
+    <audio id="sfx-click-2" src=".media/audio/sfx/sfx_004.mp3" data-start="5" data-duration="0.37" data-volume="0.22" data-track-index="13"></audio>
+    <audio id="sfx-click-3" src=".media/audio/sfx/sfx_004.mp3" data-start="5.15" data-duration="0.37" data-volume="0.22" data-track-index="14"></audio>
+    <audio id="sfx-wh-bc" src=".media/audio/sfx/sfx_002.mp3" data-start="6.4" data-duration="0.57" data-volume="0.22" data-track-index="11"></audio>
+    <audio id="sfx-pop-c" src=".media/audio/sfx/sfx_001.mp3" data-start="7.4" data-duration="0.72" data-volume="0.3" data-track-index="10"></audio>
+    <audio id="sfx-punch" src=".media/audio/sfx/sfx_007.mp3" data-start="8.5" data-duration="1.6" data-volume="0.4" data-track-index="11"></audio>
+    <audio id="sfx-ping" src=".media/audio/sfx/sfx_005.mp3" data-start="9.2" data-duration="1" data-volume="0.28" data-track-index="12"></audio>
+    <audio id="sfx-wh-out" src=".media/audio/sfx/sfx_002.mp3" data-start="11.35" data-duration="0.57" data-volume="0.26" data-track-index="13"></audio>
+    <audio id="sfx-end" src=".media/audio/sfx/sfx_008.mp3" data-start="13.2" data-duration="1.7" data-volume="0.3" data-track-index="10"></audio>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      var tl = gsap.timeline({ paused: true });
+
+      /* ---------------- camera rig ----------------
+         The world is a 2400x3600 board; #camera is a non-timed wrapper with
+         transform-origin 0 0, so screen = translate + scale * world.
+         cam(wx, wy, s) frames world point (wx, wy) at the centre of 1080x1920. */
+      var FRAME_W = 1080;
+      var FRAME_H = 1920;
+
+      function cam(wx, wy, s) {
+        return { x: FRAME_W / 2 - wx * s, y: FRAME_H / 2 - wy * s, scale: s };
+      }
+
+      function moveCam(pose, at, dur, ease) {
+        tl.to("#camera", Object.assign({}, pose, { duration: dur, ease: ease || "power2.inOut" }), at);
+      }
+
+      gsap.set("#camera", Object.assign({ transformOrigin: "0px 0px" }, cam(700, 600, 1.35)));
+
+      /* ---------------- elements pop in as the camera arrives ---------------- */
+      function popPill(sel, at) {
+        gsap.set(sel, { transformOrigin: "50% 50%" });
+        tl.fromTo(
+          sel,
+          { scale: 0.5, opacity: 0 },
+          { scale: 1, opacity: 1, duration: 0.5, ease: "back.out(2)" },
+          at,
+        );
+      }
+
+      function drawConn(sel, at, dur) {
+        var el = document.querySelector(sel);
+        var len = el.getTotalLength();
+        gsap.set(el, { strokeDasharray: len, strokeDashoffset: len });
+        tl.to(
+          el,
+          { strokeDashoffset: 0, duration: dur, ease: "power2.inOut", overwrite: "auto" },
+          at,
+        );
+      }
+
+      popPill("#pill-a", 0.3);
+      drawConn("#conn-ab", 1.4, 0.9);
+      popPill("#pill-b", 2.9);
+
+      drawConn("#conn-s1", 4.4, 0.55);
+      drawConn("#conn-s2", 4.6, 0.55);
+      drawConn("#conn-s3", 4.8, 0.55);
+      popPill("#pill-s1", 4.85);
+      popPill("#pill-s2", 5.0);
+      popPill("#pill-s3", 5.15);
+
+      drawConn("#conn-bc", 6.3, 1.0);
+      popPill("#pill-c", 7.4);
+
+      /* ---------------- the camera never cuts — it travels ---------------- */
+      moveCam(cam(1500, 1250, 1.2), 1.6, 1.8); // A → B
+      moveCam(cam(1500, 1880, 0.95), 4.0, 1.9); // B → the sub-node cluster
+      moveCam(cam(920, 2750, 1.15), 6.4, 1.7); // cluster → C
+
+      /* punch straight through C into the reaction scene */
+      moveCam(cam(920, 2750, 4.6), 8.2, 1.0, "power3.in");
+
+      /* hold inside the punch while the reaction scene owns the frame */
+      tl.to("#reaction-clip", { opacity: 1, duration: 0.26, ease: "power2.out" }, 8.9);
+      tl.set("#world-clip", { opacity: 0 }, 9.16);
+
+      tl.fromTo(
+        "#reaction-main",
+        { scale: 0.9, opacity: 0 },
+        { scale: 1, opacity: 1, duration: 0.42, ease: "back.out(1.6)" },
+        9.2,
+      );
+      tl.fromTo(
+        "#reaction-head",
+        { y: 18, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.35, ease: "power3.out" },
+        9.45,
+      );
+      tl.fromTo(
+        "#reaction-sub",
+        { y: 18, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.35, ease: "power3.out" },
+        9.7,
+      );
+
+      /* ---------------- pull all the way back out to reveal the whole map ---------------- */
+      tl.set("#world-clip", { opacity: 1 }, 11.32);
+      tl.to("#reaction-clip", { opacity: 0, duration: 0.3, ease: "power2.in" }, 11.35);
+      moveCam(cam(1250, 1700, 0.42), 11.35, 2.1, "power2.out");
+
+      tl.to("#title-clip", { opacity: 1, duration: 0.4, ease: "power2.out" }, 13.2);
+      tl.fromTo(
+        "#title-main",
+        { y: 26, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.4, ease: "power3.out" },
+        13.35,
+      );
+      tl.fromTo(
+        "#title-sub",
+        { y: 20, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.4, ease: "power3.out" },
+        13.55,
+      );
+
+      /* ---------------- SFX on the beats ---------------- */
+      tl.fromTo("#sfx-punch", { volume: 0.4 }, { volume: 0, duration: 0.5, ease: "power2.in" }, 9.6);
+
+      tl.seek(0);
+      window.__timelines["main"] = tl;
+    </script>
+
+</body>
+</html>
