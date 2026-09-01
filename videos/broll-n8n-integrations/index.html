@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <title>n8n Integrations — B-roll</title>
+    <script src="vendor/gsap.min.js"></script>
+    <style>
+      @font-face { font-family: "Kanit"; font-weight: 600; font-style: normal; src: url("assets/fonts/kanit-600.ttf") format("truetype"); }
+      @font-face { font-family: "Kanit"; font-weight: 700; font-style: normal; src: url("assets/fonts/kanit-700.ttf") format("truetype"); }
+
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: #050614; }
+      body { font-family: "Kanit", sans-serif; }
+      #root { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: #050614; }
+      .clip { position: absolute; inset: 0; overflow: hidden; }
+
+      /* ---------- deep cyber environment ---------- */
+      #bg-clip {
+        background:
+          radial-gradient(42% 24% at 52% 46%, rgba(99, 102, 241, 0.22), transparent 70%),
+          radial-gradient(46% 26% at 22% 22%, rgba(56, 189, 248, 0.14), transparent 72%),
+          radial-gradient(44% 26% at 82% 76%, rgba(168, 85, 247, 0.16), transparent 72%),
+          linear-gradient(168deg, #070a1e 0%, #05060f 55%, #04050c 100%);
+      }
+      /* defocused city / dashboard panels — gradients only, no blur filter (cheap to render) */
+      #bg-panels { position: absolute; inset: 0; opacity: 0.5; }
+      .panel {
+        position: absolute; border-radius: 18px;
+        background: linear-gradient(160deg, rgba(80,140,255,0.14), rgba(140,80,255,0.06) 60%, transparent);
+        box-shadow: 0 0 60px 20px rgba(70, 120, 255, 0.07);
+      }
+      .glowdot {
+        position: absolute; border-radius: 50%;
+        background: radial-gradient(circle, rgba(190,225,255,0.75), rgba(110,160,255,0.25) 45%, transparent 70%);
+      }
+
+      /* ---------- camera rig ---------- */
+      #stage { position: absolute; inset: 0; perspective: 1600px; }
+      #camera { position: absolute; inset: 0; transform-origin: 540px 900px; }
+      #tilt { position: absolute; inset: 0; transform-style: preserve-3d; }
+      #field { position: absolute; inset: 0; }
+
+      /* ---------- cards ---------- */
+      .card {
+        position: absolute;
+        border-radius: 30px;
+        background: linear-gradient(155deg, rgba(26,32,58,0.97) 0%, rgba(11,14,30,0.97) 100%);
+        border: 2px solid rgba(165, 185, 255, 0.55);
+        box-shadow:
+          0 0 0 1px rgba(255,255,255,0.05) inset,
+          0 0 26px rgba(150, 180, 255, 0.30) inset,
+          0 0 58px rgba(110, 140, 255, 0.5),
+          0 26px 60px rgba(0,0,0,0.62);
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        gap: 12px;
+        opacity: 0;
+      }
+      .card .leds { position: absolute; top: 14px; right: 18px; display: flex; gap: 7px; }
+      .card .leds i { width: 7px; height: 7px; border-radius: 50%; background: #4ade80; box-shadow: 0 0 8px #4ade80; }
+      .card .leds i:nth-child(2) { background: #60a5fa; box-shadow: 0 0 8px #60a5fa; }
+      .card .leds i:nth-child(3) { background: #c084fc; box-shadow: 0 0 8px #c084fc; }
+      .card .mark { display: block; }
+      .card .label {
+        color: #eef2ff; font-size: 26px; font-weight: 700; letter-spacing: 0.3px;
+        text-align: center; line-height: 1.15; text-shadow: 0 2px 10px rgba(0,0,0,0.7);
+      }
+
+      /* the n8n core */
+      #core {
+        border-radius: 44px;
+        border: 3px solid rgba(234, 75, 113, 0.55);
+        box-shadow:
+          0 0 0 1px rgba(255,255,255,0.07) inset,
+          0 0 90px rgba(234, 75, 113, 0.45),
+          0 0 190px rgba(120, 90, 255, 0.3),
+          0 34px 80px rgba(0,0,0,0.7);
+      }
+      #core .label { font-size: 46px; }
+      #core-ring {
+        position: absolute; left: 50%; top: 50%; width: 420px; height: 420px; margin: -210px 0 0 -210px;
+        border-radius: 50%; border: 2px solid rgba(234, 75, 113, 0.5); opacity: 0; pointer-events: none;
+      }
+
+      /* ---------- cables ---------- */
+      /* two strokes instead of a blur filter: a wide soft body under a bright core */
+      .cable-glow { fill: none; stroke: rgba(120, 165, 255, 0.20); stroke-width: 16; stroke-linecap: round; }
+      .cable      { fill: none; stroke: rgba(196, 220, 255, 0.85); stroke-width: 4;  stroke-linecap: round; }
+      .pulse      { fill: none; stroke: #ffffff; stroke-width: 9; stroke-linecap: round; opacity: 0; }
+      .pulse-wide { fill: none; stroke: rgba(140, 190, 255, 0.5); stroke-width: 22; stroke-linecap: round; opacity: 0; }
+
+      /* ---------- grade ---------- */
+      #vignette {
+        position: absolute; inset: 0; pointer-events: none;
+        background: radial-gradient(82% 62% at 50% 47%, transparent 58%, rgba(2, 3, 10, 0.72) 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="30"
+         data-width="1080" data-height="1920" data-fps="30">
+
+      <div id="bg-clip" class="clip" data-start="0" data-duration="30" data-track-index="0">
+        <div id="bg-panels"></div>
+        <div id="vignette"></div>
+      </div>
+
+      <div id="field-clip" class="clip" data-start="0" data-duration="30" data-track-index="1"
+           data-layout-allow-overflow>
+        <div id="stage">
+          <div id="camera" data-layout-allow-overflow>
+            <div id="tilt">
+              <svg id="wires" viewBox="0 0 1080 1920"
+                   style="position:absolute; inset:0; width:1080px; height:1920px; overflow:visible;"></svg>
+              <div id="field"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <script id="brand-data" type="application/json">{
+  "n8n": {
+    "title": "n8n",
+    "hex": "EA4B71",
+    "path": "M21.4737 5.6842c-1.1772 0-2.1663.8051-2.4468 1.8947h-2.8955c-1.235 0-2.289.893-2.492 2.111l-.1038.623a1.263 1.263 0 0 1-1.246 1.0555H11.289c-.2805-1.0896-1.2696-1.8947-2.4468-1.8947s-2.1663.8051-2.4467 1.8947H4.973c-.2805-1.0896-1.2696-1.8947-2.4468-1.8947C1.1311 9.4737 0 10.6047 0 12s1.131 2.5263 2.5263 2.5263c1.1772 0 2.1663-.8051 2.4468-1.8947h1.4223c.2804 1.0896 1.2696 1.8947 2.4467 1.8947 1.1772 0 2.1663-.8051 2.4468-1.8947h1.0008a1.263 1.263 0 0 1 1.2459 1.0555l.1038.623c.203 1.218 1.257 2.111 2.492 2.111h.3692c.2804 1.0895 1.2696 1.8947 2.4468 1.8947 1.3952 0 2.5263-1.131 2.5263-2.5263s-1.131-2.5263-2.5263-2.5263c-1.1772 0-2.1664.805-2.4468 1.8947h-.3692a1.263 1.263 0 0 1-1.246-1.0555l-.1037-.623A2.52 2.52 0 0 0 13.9607 12a2.52 2.52 0 0 0 .821-1.4794l.1038-.623a1.263 1.263 0 0 1 1.2459-1.0555h2.8955c.2805 1.0896 1.2696 1.8947 2.4468 1.8947 1.3952 0 2.5263-1.131 2.5263-2.5263s-1.131-2.5263-2.5263-2.5263m0 1.2632a1.263 1.263 0 0 1 1.2631 1.2631 1.263 1.263 0 0 1-1.2631 1.2632 1.263 1.263 0 0 1-1.2632-1.2632 1.263 1.263 0 0 1 1.2632-1.2631M2.5263 10.7368A1.263 1.263 0 0 1 3.7895 12a1.263 1.263 0 0 1-1.2632 1.2632A1.263 1.263 0 0 1 1.2632 12a1.263 1.263 0 0 1 1.2631-1.2632m6.3158 0A1.263 1.263 0 0 1 10.1053 12a1.263 1.263 0 0 1-1.2632 1.2632A1.263 1.263 0 0 1 7.579 12a1.263 1.263 0 0 1 1.2632-1.2632m10.1053 3.7895a1.263 1.263 0 0 1 1.2631 1.2632 1.263 1.263 0 0 1-1.2631 1.2631 1.263 1.263 0 0 1-1.2632-1.2631 1.263 1.263 0 0 1 1.2632-1.2632"
+  },
+  "line": {
+    "title": "LINE",
+    "hex": "00C300",
+    "path": "M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.282.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"
+  },
+  "gmail": {
+    "title": "Gmail",
+    "hex": "EA4335",
+    "path": "M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z"
+  },
+  "sheets": {
+    "title": "Google Sheets",
+    "hex": "34A853",
+    "path": "M11.318 12.545H7.91v-1.909h3.41v1.91zM14.728 0v6h6l-6-6zm1.363 10.636h-3.41v1.91h3.41v-1.91zm0 3.273h-3.41v1.91h3.41v-1.91zM20.727 6.5v15.864c0 .904-.732 1.636-1.636 1.636H4.909a1.636 1.636 0 0 1-1.636-1.636V1.636C3.273.732 4.005 0 4.909 0h9.318v6.5h6.5zm-3.273 2.773H6.545v7.909h10.91v-7.91zm-6.136 4.636H7.91v1.91h3.41v-1.91z"
+  },
+  "whatsapp": {
+    "title": "WhatsApp",
+    "hex": "25D366",
+    "path": "M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"
+  },
+  "calendar": {
+    "title": "Google Calendar",
+    "hex": "4285F4",
+    "path": "M18.316 5.684H24v12.632h-5.684V5.684zM5.684 24h12.632v-5.684H5.684V24zM18.316 5.684V0H1.895A1.894 1.894 0 0 0 0 1.895v16.421h5.684V5.684h12.632zm-7.207 6.25v-.065c.272-.144.5-.349.687-.617s.279-.595.279-.982c0-.379-.099-.72-.3-1.025a2.05 2.05 0 0 0-.832-.714 2.703 2.703 0 0 0-1.197-.257c-.6 0-1.094.156-1.481.467-.386.311-.65.671-.793 1.078l1.085.452c.086-.249.224-.461.413-.633.189-.172.445-.257.767-.257.33 0 .602.088.816.264a.86.86 0 0 1 .322.703c0 .33-.12.589-.36.778-.24.19-.535.284-.886.284h-.567v1.085h.633c.407 0 .748.109 1.02.327.272.218.407.499.407.843 0 .336-.129.614-.387.832s-.565.327-.924.327c-.351 0-.651-.103-.897-.311-.248-.208-.422-.502-.521-.881l-1.096.452c.178.616.505 1.082.977 1.401.472.319.984.478 1.538.477a2.84 2.84 0 0 0 1.293-.291c.382-.193.684-.458.902-.794.218-.336.327-.72.327-1.149 0-.429-.115-.797-.344-1.105a2.067 2.067 0 0 0-.881-.689zm2.093-1.931l.602.913L15 10.045v5.744h1.187V8.446h-.827l-2.158 1.557zM22.105 0h-3.289v5.184H24V1.895A1.894 1.894 0 0 0 22.105 0zm-3.289 23.5l4.684-4.684h-4.684V23.5zM0 22.105C0 23.152.848 24 1.895 24h3.289v-5.184H0v3.289z"
+  },
+  "shopify": {
+    "title": "Shopify",
+    "hex": "7AB55C",
+    "path": "M15.337 23.979l7.216-1.561s-2.604-17.613-2.625-17.73c-.018-.116-.114-.192-.211-.192s-1.929-.136-1.929-.136-1.275-1.274-1.439-1.411c-.045-.037-.075-.057-.121-.074l-.914 21.104h.023zM11.71 11.305s-.81-.424-1.774-.424c-1.447 0-1.504.906-1.504 1.141 0 1.232 3.24 1.715 3.24 4.629 0 2.295-1.44 3.76-3.406 3.76-2.354 0-3.54-1.465-3.54-1.465l.646-2.086s1.245 1.066 2.28 1.066c.675 0 .975-.545.975-.932 0-1.619-2.654-1.694-2.654-4.359-.034-2.237 1.571-4.416 4.827-4.416 1.257 0 1.875.361 1.875.361l-.945 2.715-.02.01zM11.17.83c.136 0 .271.038.405.135-.984.465-2.064 1.639-2.508 3.992-.656.213-1.293.405-1.889.578C7.697 3.75 8.951.84 11.17.84V.83zm1.235 2.949v.135c-.754.232-1.583.484-2.394.736.466-1.777 1.333-2.645 2.085-2.971.193.501.309 1.176.309 2.1zm.539-2.234c.694.074 1.141.867 1.429 1.755-.349.114-.735.231-1.158.366v-.252c0-.752-.096-1.371-.271-1.871v.002zm2.992 1.289c-.02 0-.06.021-.078.021s-.289.075-.714.21c-.423-1.233-1.176-2.37-2.508-2.37h-.115C12.135.209 11.669 0 11.265 0 8.159 0 6.675 3.877 6.21 5.846c-1.194.365-2.063.636-2.16.674-.675.213-.694.232-.772.87-.075.462-1.83 14.063-1.83 14.063L15.009 24l.927-21.166z"
+  }
+}</script>
+    <script>
+      window.__timelines = window.__timelines || {};
+      var tl = gsap.timeline({ paused: true });
+
+      var BRANDS = JSON.parse(document.getElementById("brand-data").textContent);
+
+      function mulberry32(a) {
+        return function () {
+          a |= 0; a = (a + 0x6d2b79f5) | 0;
+          var t = Math.imul(a ^ (a >>> 15), 1 | a);
+          t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+          return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+        };
+      }
+      var rnd = mulberry32(20260901);
+
+      /* ---------- defocused background ---------- */
+      var panels = document.getElementById("bg-panels");
+      for (var i = 0; i < 7; i++) {
+        var p = document.createElement("div");
+        p.className = "panel";
+        var w = 220 + rnd() * 320, h = 260 + rnd() * 460;
+        p.style.width = w + "px"; p.style.height = h + "px";
+        p.style.left = (rnd() < 0.5 ? -90 + rnd() * 190 : 780 + rnd() * 210) + "px";
+        p.style.top = (rnd() * 1700 - 120) + "px";
+        p.style.opacity = (0.35 + rnd() * 0.5).toFixed(2);
+        panels.appendChild(p);
+      }
+      var bgdots = [];
+      for (var j = 0; j < 46; j++) {
+        var g = document.createElement("div");
+        g.className = "glowdot";
+        var s = 6 + rnd() * 26;
+        g.style.width = s + "px"; g.style.height = s + "px";
+        g.style.left = (rnd() * 1080).toFixed(0) + "px";
+        g.style.top = (rnd() * 1920).toFixed(0) + "px";
+        g.style.opacity = (0.12 + rnd() * 0.5).toFixed(2);
+        panels.appendChild(g);
+        bgdots.push(g);
+      }
+
+      /* ---------- the node graph, laid out like the reference frame ---------- */
+      var CORE = { x: 540, y: 900, size: 300 };
+      var NODES = [
+        { id: "line",     x: 605, y: 404,  size: 210, brand: "line",     label: "LINE" },
+        { id: "sheets",   x: 288, y: 609,  size: 205, brand: "sheets",   label: "Google\nSheets" },
+        { id: "shopify",  x: 797, y: 665,  size: 200, brand: "shopify",  label: "Shopify" },
+        { id: "gmail",    x: 236, y: 978,  size: 205, brand: "gmail",    label: "Gmail" },
+        { id: "db",       x: 844, y: 1000, size: 200, generic: "db",     label: "Database" },
+        { id: "http",     x: 301, y: 1313, size: 200, generic: "http",   label: "HTTP\nRequest" },
+        { id: "whatsapp", x: 744, y: 1252, size: 205, brand: "whatsapp", label: "WhatsApp" },
+        { id: "hook",     x: 542, y: 1500, size: 200, generic: "hook",   label: "Webhook" },
+        { id: "calendar", x: 249, y: 1613, size: 195, brand: "calendar", label: "Google\nCalendar" },
+      ];
+
+      var GENERIC = {
+        db:   { hex: "9fb4d8", path: "M12 2C7 2 3 3.6 3 5.6v12.8C3 20.4 7 22 12 22s9-1.6 9-3.6V5.6C21 3.6 17 2 12 2zm0 2c4.3 0 7 1.3 7 1.6S16.3 7.2 12 7.2 5 5.9 5 5.6 7.7 4 12 4zm7 14.4c0 .3-2.7 1.6-7 1.6s-7-1.3-7-1.6v-2.7c1.7.9 4.3 1.3 7 1.3s5.3-.4 7-1.3v2.7zm0-5.4c0 .3-2.7 1.6-7 1.6s-7-1.3-7-1.6v-2.7c1.7.9 4.3 1.3 7 1.3s5.3-.4 7-1.3V13z" },
+        http: { hex: "9fb4d8", path: "M12 2a10 10 0 100 20 10 10 0 000-20zm6.9 6h-2.9a15.7 15.7 0 00-1.4-3.6A8 8 0 0118.9 8zM12 4.2c.7 1 1.3 2.3 1.7 3.8h-3.4c.4-1.5 1-2.8 1.7-3.8zM4.3 14a8 8 0 010-4h3.3a17.6 17.6 0 000 4H4.3zm.8 2h2.9c.3 1.3.8 2.5 1.4 3.6A8 8 0 015.1 16zm2.9-8H5.1a8 8 0 013.5-3.6C8 5.5 7.5 6.7 7.3 8zM12 19.8c-.7-1-1.3-2.3-1.7-3.8h3.4c-.4 1.5-1 2.8-1.7 3.8zm2.1-5.8H9.9a15.6 15.6 0 010-4h4.2a15.6 15.6 0 010 4zm.3 5.6c.6-1.1 1.1-2.3 1.4-3.6h2.9a8 8 0 01-4.3 3.6zM16.4 14a17.6 17.6 0 000-4h3.3a8 8 0 010 4h-3.3z" },
+        hook: { hex: "9fb4d8", path: "M10 3a4.5 4.5 0 00-3.2 7.7l1.5-1.5A2.5 2.5 0 1112 8.5h1V6.6A4.5 4.5 0 0010 3zm7.5 5.5a4.5 4.5 0 00-3.1 1.3l1.4 1.4a2.5 2.5 0 113.5 3.5l-2.9 2.9-1.4-1.4-1.4 1.4 2.8 2.9 4.3-4.3a4.5 4.5 0 00-3.2-7.7zM6.5 10.9l-4 4A4.5 4.5 0 009.7 21l2.9-2.9-1.4-1.4-2.9 2.9a2.5 2.5 0 11-3.5-3.5l4-4-1.3-1.2zM11 12l-1.4 1.4 3.5 3.5L14.5 15 11 12z" },
+      };
+
+      var svg = document.getElementById("wires");
+      var field = document.getElementById("field");
+      var SVGNS = "http://www.w3.org/2000/svg";
+
+      function iconSvg(spec, px) {
+        return '<svg class="mark" width="' + px + '" height="' + px + '" viewBox="0 0 24 24" fill="#' +
+          spec.hex + '"><path d="' + spec.path + '"/></svg>';
+      }
+
+      function makeCard(cfg, isCore) {
+        var el = document.createElement("div");
+        el.className = "card";
+        el.id = "card-" + cfg.id;
+        el.style.width = cfg.size + "px";
+        el.style.height = cfg.size + "px";
+        el.style.left = (cfg.x - cfg.size / 2) + "px";
+        el.style.top = (cfg.y - cfg.size / 2) + "px";
+        var spec = cfg.brand ? BRANDS[cfg.brand] : GENERIC[cfg.generic];
+        var iconPx = isCore ? 118 : Math.round(cfg.size * 0.34);
+        el.innerHTML =
+          '<div class="leds"><i></i><i></i><i></i></div>' +
+          iconSvg(spec, iconPx) +
+          '<div class="label">' + cfg.label.replace(/\n/g, "<br>") + "</div>";
+        field.appendChild(el);
+        return el;
+      }
+
+      /* core first in DOM so the satellites paint above the cables */
+      var coreEl = makeCard({ id: "core", x: CORE.x, y: CORE.y, size: CORE.size, brand: "n8n", label: "n8n" }, true);
+      coreEl.id = "core";
+      var ring = document.createElement("div");
+      ring.id = "core-ring";
+      coreEl.appendChild(ring);
+
+      /* ---------- cables from the core to every node ---------- */
+      var cables = [];
+      NODES.forEach(function (n, k) {
+        var dx = n.x - CORE.x, dy = n.y - CORE.y;
+        var dist = Math.sqrt(dx * dx + dy * dy);
+        var ux = dx / dist, uy = dy / dist;
+        // leave the core from its edge, arrive at the card edge
+        var x1 = CORE.x + ux * (CORE.size / 2 - 6);
+        var y1 = CORE.y + uy * (CORE.size / 2 - 6);
+        var x2 = n.x - ux * (n.size / 2 - 6);
+        var y2 = n.y - uy * (n.size / 2 - 6);
+        // bow each cable to one side so they read as separate strands
+        var side = k % 2 === 0 ? 1 : -1;
+        var bow = 90 + (k % 3) * 46;
+        var mx = (x1 + x2) / 2 - uy * bow * side;
+        var my = (y1 + y2) / 2 + ux * bow * side;
+        var d = "M " + x1.toFixed(1) + " " + y1.toFixed(1) +
+                " Q " + mx.toFixed(1) + " " + my.toFixed(1) +
+                " " + x2.toFixed(1) + " " + y2.toFixed(1);
+
+        ["cable-glow", "cable", "pulse-wide", "pulse"].forEach(function (cls) {
+          var p = document.createElementNS(SVGNS, "path");
+          p.setAttribute("class", cls);
+          p.setAttribute("d", d);
+          if (cls === "pulse") p.id = "pulse-" + n.id;
+          if (cls === "pulse-wide") p.id = "pulsew-" + n.id;
+          if (cls === "cable") p.id = "cable-" + n.id;
+          svg.appendChild(p);
+        });
+        cables.push(n.id);
+        makeCard(n, false);
+      });
+
+      /* ---------- motion ---------- */
+      gsap.set("#camera", { transformOrigin: "540px 900px", scale: 0.86 });
+      gsap.set("#tilt", { rotateX: 6, transformPerspective: 1600, transformOrigin: "50% 58%" });
+
+      /* slow push-in across the whole 30s */
+      tl.to("#camera", { scale: 1.12, duration: 30, ease: "power1.inOut" }, 0);
+      tl.to("#camera", { x: -18, y: 12, duration: 15, ease: "sine.inOut", yoyo: true, repeat: 1 }, 0);
+
+      /* core lands first */
+      gsap.set("#core", { transformOrigin: "50% 50%" });
+      tl.fromTo("#core", { scale: 0.6, opacity: 0 },
+        { scale: 1, opacity: 1, duration: 0.8, ease: "back.out(1.7)" }, 0.3);
+
+      /* cables draw, each node pops as its cable lands */
+      NODES.forEach(function (n, k) {
+        var at = 1.1 + k * 0.42;
+        var el = document.getElementById("cable-" + n.id);
+        var len = el.getTotalLength();
+        [".cable-glow", ""].forEach(function () {});
+        ["cable-" + n.id].forEach(function (id) {
+          var e = document.getElementById(id);
+          gsap.set(e, { strokeDasharray: len, strokeDashoffset: len });
+          tl.to(e, { strokeDashoffset: 0, duration: 0.6, ease: "power2.inOut", overwrite: "auto" }, at);
+        });
+        gsap.set("#card-" + n.id, { transformOrigin: "50% 50%" });
+        tl.fromTo("#card-" + n.id, { scale: 0.55, opacity: 0 },
+          { scale: 1, opacity: 1, duration: 0.55, ease: "back.out(1.9)" }, at + 0.35);
+
+        /* everything floats on its own clock */
+        var per = 8 + (k % 4) * 1.7;
+        tl.to("#card-" + n.id, {
+          y: k % 2 === 0 ? -16 : 14, x: k % 3 === 0 ? 9 : -7,
+          duration: per / 2, ease: "sine.inOut", yoyo: true,
+          repeat: Math.max(1, Math.ceil((30 - at) / (per / 2)) - 1), overwrite: "auto",
+        }, at + 0.6);
+      });
+
+      tl.to("#core", { y: -11, duration: 6, ease: "sine.inOut", yoyo: true, repeat: 4 }, 1.2);
+
+      /* core fires a ring every 6s */
+      gsap.set("#core-ring", { transformOrigin: "50% 50%" });
+      for (var r = 0; r < 5; r++) {
+        tl.fromTo("#core-ring", { scale: 0.5, opacity: 0.5 },
+          { scale: 1.85, opacity: 0, duration: 2.6, ease: "power2.out",
+            immediateRender: r === 0, overwrite: "auto" }, 2.4 + r * 6);
+      }
+
+      /* ---------- data pulses running the cables ---------- */
+      function runPulse(id, start, dur, gap) {
+        ["pulse-" + id, "pulsew-" + id].forEach(function (pid) {
+          var el = document.getElementById(pid);
+          var len = el.getTotalLength();
+          var dash = pid.indexOf("pulsew") === 0 ? 150 : 110;
+          gsap.set(el, { strokeDasharray: dash + " " + len, strokeDashoffset: dash });
+          for (var p = 0; start + p * (dur + gap) + dur <= 30; p++) {
+            var at = start + p * (dur + gap);
+            tl.set(el, { opacity: pid.indexOf("pulsew") === 0 ? 0.55 : 1 }, at);
+            tl.fromTo(el, { strokeDashoffset: dash },
+              { strokeDashoffset: -len, duration: dur, ease: "sine.inOut", overwrite: "auto" }, at);
+            tl.set(el, { opacity: 0 }, at + dur);
+          }
+        });
+      }
+      NODES.forEach(function (n, k) {
+        runPulse(n.id, 4.4 + k * 0.55, 1.5, 3.4 + (k % 3) * 0.9);
+      });
+
+      /* ---------- background drifts for parallax ---------- */
+      tl.to("#bg-panels", { y: -46, duration: 15, ease: "sine.inOut", yoyo: true, repeat: 1 }, 0);
+      bgdots.forEach(function (el, k) {
+        if (k % 3 !== 0) return;
+        tl.to(el, { opacity: 0.06, duration: 3.75, ease: "sine.inOut", yoyo: true,
+                    repeat: 7, overwrite: "auto" }, (k % 5) * 0.6);
+      });
+
+      tl.seek(0);
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>
