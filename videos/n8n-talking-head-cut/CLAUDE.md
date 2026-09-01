@@ -98,3 +98,17 @@ Fix all errors before presenting the result. Warnings should be reviewed before 
 4. Videos use `muted` with a separate `<audio>` element for the audio track
 5. Sub-compositions use `data-composition-src="compositions/file.html"` to reference other HTML files
 6. Only deterministic logic — no `Date.now()`, no `Math.random()`, no network fetches
+
+## Notes on this cut
+
+- Source take is 23.5s; the 50s target is met by building around it, not by
+  stretching it.
+- The supplied script reads as ~45-50s of speech, so it is spread across the
+  whole piece rather than crammed over the take. Captions 1-3 sit on the take;
+  the capability rows, results and CTA carry the rest.
+- The take keeps its original audio. Nothing in this environment can hear Thai
+  speech, so the captions are the script the author supplied, not a verified
+  transcript of what is said on camera.
+- The 70% workload figure comes from the author's own script.
+- `renders/video.mp4` is the full-quality render (56 MB). `renders/video-web.mp4`
+  is a CRF 25 copy for sharing, since 56 MB exceeds common upload limits.

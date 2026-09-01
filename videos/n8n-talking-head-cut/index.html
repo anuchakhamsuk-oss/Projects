@@ -17,302 +17,258 @@
       #root { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: #08080b; color: #fff; }
       .clip { position: absolute; inset: 0; overflow: hidden; }
 
-      /* ================= shared look ================= */
       .darkbg {
         background:
-          radial-gradient(66% 40% at 50% 40%, rgba(255, 45, 85, 0.16), transparent 72%),
-          radial-gradient(50% 30% at 50% 86%, rgba(180, 12, 50, 0.12), transparent 74%), #08080b;
+          radial-gradient(66% 40% at 50% 38%, rgba(255, 45, 85, 0.17), transparent 72%),
+          radial-gradient(50% 30% at 50% 88%, rgba(180, 12, 50, 0.12), transparent 74%), #08080b;
       }
       .stars {
         position: absolute; inset: 0;
         background-image:
-          radial-gradient(rgba(255,255,255,0.42) 1.5px, transparent 1.5px),
-          radial-gradient(rgba(255,255,255,0.24) 1.5px, transparent 1.5px);
+          radial-gradient(rgba(255,255,255,0.4) 1.5px, transparent 1.5px),
+          radial-gradient(rgba(255,255,255,0.22) 1.5px, transparent 1.5px);
         background-size: 250px 250px, 165px 165px;
         background-position: 0 0, 85px 110px;
         opacity: 0.5;
       }
-      .accent { color: #ff4d70; }
 
-      /* ================= 1 · intro ================= */
-      #intro-clip {
-        display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px;
-      }
-      #intro-mark { opacity: 0; }
-      #intro-1 { font-size: 46px; font-weight: 600; color: #98a0ad; opacity: 0; }
-      #intro-2 { font-size: 104px; font-weight: 800; line-height: 1.22; text-align: center; opacity: 0; }
-      #intro-3 { font-size: 44px; font-weight: 700; color: #ff4d70; opacity: 0; margin-top: 8px; }
-
-      /* ================= 2 · the footage ================= */
-      #vid-clip { background: transparent; }
+      /* ============ 1 · the take ============ */
       #talking {
-        position: absolute; left: 0; top: 0;
-        width: 1080px; height: 1920px;
+        position: absolute; left: 0; top: 0; width: 1080px; height: 1920px;
         object-fit: cover; background: #000;
       }
-      /* keeps the face readable under the overlays */
+      #vid-clip { background: transparent; }
       #vid-scrim {
         position: absolute; inset: 0; pointer-events: none;
         background:
-          linear-gradient(180deg, rgba(6,6,10,0.78) 0%, transparent 22%),
-          linear-gradient(0deg, rgba(6,6,10,0.86) 0%, transparent 30%);
+          linear-gradient(180deg, rgba(6,6,10,0.8) 0%, transparent 20%),
+          linear-gradient(0deg, rgba(6,6,10,0.9) 0%, rgba(6,6,10,0.55) 22%, transparent 42%);
       }
       #brandbar {
         position: absolute; top: 74px; left: 50%; transform: translateX(-50%);
         display: flex; align-items: center; gap: 16px;
         padding: 16px 34px; border-radius: 999px;
-        background: rgba(12,12,18,0.72); border: 2px solid rgba(255,77,112,0.5);
-        box-shadow: 0 0 40px rgba(255,45,85,0.3);
+        background: rgba(12,12,18,0.74); border: 2px solid rgba(255,77,112,0.55);
+        box-shadow: 0 0 40px rgba(255,45,85,0.32); opacity: 0;
+      }
+      #brandbar .txt { font-size: 34px; font-weight: 700; }
+      #lower { position: absolute; left: 66px; bottom: 470px; opacity: 0; }
+      #lower .rule { width: 96px; height: 7px; border-radius: 4px; background: #ff4d70; margin-bottom: 16px; }
+      #lower .l1 { font-size: 54px; font-weight: 800; line-height: 1.2; }
+      #lower .l2 { font-size: 34px; font-weight: 600; color: #c9cfda; margin-top: 6px; }
+
+      .cap {
+        position: absolute; left: 56px; right: 56px; bottom: 175px;
+        text-align: center; font-size: 56px; font-weight: 800; line-height: 1.32;
+        text-shadow: 0 6px 26px rgba(0,0,0,0.95), 0 2px 8px rgba(0,0,0,0.95);
         opacity: 0;
       }
-      #brandbar .txt { font-size: 34px; font-weight: 700; letter-spacing: 0.5px; }
-      #lower {
-        position: absolute; left: 70px; bottom: 300px; opacity: 0;
-      }
-      #lower .rule { width: 96px; height: 7px; border-radius: 4px; background: #ff4d70; margin-bottom: 18px; }
-      #lower .l1 { font-size: 58px; font-weight: 800; line-height: 1.2; }
-      #lower .l2 { font-size: 36px; font-weight: 600; color: #c9cfda; margin-top: 6px; }
+      .cap b { color: #ff5c7c; font-weight: 800; }
 
-      /* caption slot — filled once the spoken script arrives */
-      #caption {
-        position: absolute; left: 60px; right: 60px; bottom: 150px;
-        text-align: center; font-size: 52px; font-weight: 800; line-height: 1.3;
-        text-shadow: 0 6px 26px rgba(0,0,0,0.9), 0 2px 8px rgba(0,0,0,0.9);
+      /* ============ 2 · capabilities ============ */
+      .sec-head {
+        position: absolute; top: 250px; left: 60px; right: 60px; text-align: center;
+        font-size: 72px; font-weight: 800; opacity: 0;
+      }
+      .row {
+        position: absolute; left: 80px; width: 920px; height: 168px;
+        display: flex; align-items: center; gap: 30px; padding: 0 38px;
+        border-radius: 34px;
+        background: rgba(255,255,255,0.055); border: 3px solid rgba(255,255,255,0.13);
         opacity: 0;
       }
+      .row .ico { width: 76px; display: flex; align-items: center; justify-content: center; flex: 0 0 76px; }
+      .row .ico.multi { gap: 10px; width: 150px; flex: 0 0 150px; }
+      .row .txt { font-size: 44px; font-weight: 700; line-height: 1.24; }
+      .row .txt small { display: block; font-size: 30px; font-weight: 600; color: #9aa2ae; margin-top: 4px; }
 
-      /* ================= 3 · explainer ================= */
-      #ex-clip { }
-      #ex-head {
-        position: absolute; top: 210px; left: 60px; right: 60px; text-align: center;
-        font-size: 68px; font-weight: 800; opacity: 0;
+      /* ============ 3 · results ============ */
+      .res {
+        position: absolute; left: 90px; width: 900px; height: 150px;
+        display: flex; align-items: center; gap: 28px; padding: 0 36px;
+        border-radius: 30px; opacity: 0;
+        background: linear-gradient(96deg, rgba(255,59,99,0.20), rgba(255,59,99,0.05));
+        border: 3px solid rgba(255,92,124,0.4);
       }
-      #ex-svg { position: absolute; inset: 0; }
-      .wire { fill: none; stroke: rgba(255,255,255,0.85); stroke-width: 9; stroke-linecap: round; }
-      .wire-glow { fill: none; stroke: rgba(255,120,150,0.22); stroke-width: 26; stroke-linecap: round; }
-      .pulse { fill: none; stroke: #fff; stroke-width: 13; stroke-linecap: round; opacity: 0; }
-      .exnode {
-        position: absolute; display: flex; align-items: center; justify-content: center;
-        border-radius: 999px; white-space: nowrap; opacity: 0;
-        background: linear-gradient(180deg, #ff3b63 0%, #e2093c 100%);
-        box-shadow: 0 0 0 3px rgba(255,255,255,0.16) inset, 0 0 50px rgba(255,45,85,0.55), 0 16px 40px rgba(0,0,0,0.55);
-        color: #fff; font-weight: 700;
+      .res .tick {
+        width: 62px; height: 62px; flex: 0 0 62px; border-radius: 50%;
+        background: linear-gradient(180deg,#ff3b63,#e2093c);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 36px; font-weight: 800; box-shadow: 0 0 26px rgba(255,45,85,0.6);
       }
-      .exnode.ghost {
-        background: linear-gradient(180deg, #3a3d47 0%, #23252c 100%);
-        box-shadow: 0 0 0 3px rgba(255,255,255,0.1) inset, 0 14px 34px rgba(0,0,0,0.55);
-        color: #e6e8ee; font-weight: 600;
-      }
+      .res .txt { font-size: 46px; font-weight: 700; }
+      .res .txt b { color: #ff8fa5; }
 
-      /* ================= 4 · CTA ================= */
-      #cta-clip {
-        display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px;
-      }
-      #cta-1 { font-size: 76px; font-weight: 800; opacity: 0; }
+      /* ============ 4 · CTA ============ */
+      #cta-clip { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; }
+      #cta-1 { font-size: 62px; font-weight: 800; text-align: center; line-height: 1.28; opacity: 0; padding: 0 70px; }
       #cta-pill {
         display: flex; align-items: center; justify-content: center;
-        padding: 34px 70px; border-radius: 999px; font-size: 52px; font-weight: 700;
+        padding: 32px 66px; border-radius: 999px; font-size: 50px; font-weight: 700;
         background: linear-gradient(180deg, #ff3b63 0%, #e2093c 100%);
         box-shadow: 0 0 0 3px rgba(255,255,255,0.18) inset, 0 0 60px rgba(255,45,85,0.6);
-        opacity: 0; margin-top: 10px;
+        opacity: 0; margin-top: 14px;
       }
-      #cta-2 { font-size: 38px; font-weight: 600; color: #98a0ad; opacity: 0; margin-top: 10px; }
+      #cta-2 { font-size: 36px; font-weight: 600; color: #98a0ad; opacity: 0; margin-top: 8px; }
     </style>
   </head>
   <body>
     <div id="root" data-composition-id="main" data-start="0" data-duration="50"
          data-width="1080" data-height="1920" data-fps="30">
 
-      <!-- ============ 1 · INTRO 0 - 5.0 ============ -->
-      <div id="intro-clip" class="clip darkbg" data-start="0" data-duration="5.0" data-track-index="0">
-        <div class="stars"></div>
-        <svg id="intro-mark" width="150" height="150" viewBox="0 0 24 24" fill="#EA4B71"><path id="n8n-path" d=""/></svg>
-        <div id="intro-1">ระบบที่ทำให้ร้านคุณ</div>
-        <div id="intro-2">ตอบลูกค้าเอง<br />ทั้งวันทั้งคืน</div>
-        <div id="intro-3">n8n Chatbot</div>
-      </div>
-
-      <!-- ============ 2 · FOOTAGE 5.0 - 28.5 ============ -->
-      <!-- the footage owns its own timing, so it must not sit inside a timed wrapper -->
+      <!-- ===== 1 · THE TAKE 0 - 23.5 ===== -->
       <video id="talking" src="assets/video/talking-head.mp4"
-             data-start="5.0" data-duration="23.5" muted playsinline></video>
+             data-start="0" data-duration="23.5" muted playsinline></video>
 
-      <div id="vid-clip" class="clip" data-start="5.0" data-duration="23.5" data-track-index="1">
+      <div id="vid-clip" class="clip" data-start="0" data-duration="23.5" data-track-index="1">
         <div id="vid-scrim"></div>
-
         <div id="brandbar">
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="#EA4B71"><path id="n8n-path-2" d=""/></svg>
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="#EA4B71"><path id="mark-bar" d=""/></svg>
           <div class="txt">n8n Chatbot</div>
         </div>
-
         <div id="lower">
           <div class="rule"></div>
           <div class="l1">รับทำระบบอัตโนมัติ</div>
           <div class="l2">n8n · เชื่อม LINE / เว็บ / Google Sheets</div>
         </div>
 
-        <!-- ▼ ช่องคำบรรยาย — เติมเมื่อได้สคริปต์ที่พูด -->
-        <div id="caption"></div>
+        <div class="cap" id="cap-1">สวัสดีครับ วันนี้ผมมาแนะนำ<br /><b>n8n Chatbot</b></div>
+        <div class="cap" id="cap-2">ระบบแชทบอทอัจฉริยะ<br />ที่จะเปลี่ยนวิธีจัดการลูกค้าของคุณ</div>
+        <div class="cap" id="cap-3">n8n คือแพลตฟอร์ม <b>No-Code</b><br />สร้างแชทบอทได้ <b>โดยไม่ต้องเขียนโค้ด</b></div>
       </div>
       <audio id="talking-audio" src="assets/video/talking-head.mp4"
-             data-start="5.0" data-duration="23.5" data-volume="1"></audio>
+             data-start="0" data-duration="23.5" data-volume="1"></audio>
 
-      <!-- ============ 3 · EXPLAINER 28.5 - 43.5 ============ -->
-      <div id="ex-clip" class="clip darkbg" data-start="28.5" data-duration="15.0" data-track-index="2">
+      <!-- ===== 2 · CAPABILITIES 23.5 - 37.5 ===== -->
+      <div id="cap-clip" class="clip darkbg" data-start="23.5" data-duration="14.0" data-track-index="2">
         <div class="stars"></div>
-        <div id="ex-head">ระบบทำงานยังไง</div>
-        <svg id="ex-svg" viewBox="0 0 1080 1920">
-          <path id="w-ab" class="wire-glow" d="M 540 700 C 540 790 540 830 540 900" />
-          <path id="w-ab2" class="wire" d="M 540 700 C 540 790 540 830 540 900" />
-          <path id="w-bs1" class="wire" d="M 540 1075 C 540 1200 300 1180 300 1290" />
-          <path id="w-bs2" class="wire" d="M 540 1075 L 540 1290" />
-          <path id="w-bs3" class="wire" d="M 540 1075 C 540 1200 780 1180 780 1290" />
-          <path id="w-bc" class="wire-glow" d="M 750 990 C 900 1080 900 1450 620 1560" />
-          <path id="w-bc2" class="wire" d="M 750 990 C 900 1080 900 1450 620 1560" />
-          <path id="p-ab" class="pulse" d="M 540 700 C 540 790 540 830 540 900" />
-          <path id="p-bc" class="pulse" d="M 750 990 C 900 1080 900 1450 620 1560" />
-        </svg>
-        <div id="ex-a" class="exnode" style="left:290px; top:540px; width:500px; height:160px; font-size:52px;">ลูกค้าทักเข้ามา</div>
-        <div id="ex-b" class="exnode" style="left:270px; top:900px; width:540px; height:175px; font-size:60px;">AI Agent</div>
-        <div id="ex-s1" class="exnode ghost" style="left:120px; top:1290px; width:360px; height:120px; font-size:38px;">Chat Model</div>
-        <div id="ex-s2" class="exnode ghost" style="left:390px; top:1420px; width:300px; height:120px; font-size:38px;">Memory</div>
-        <div id="ex-s3" class="exnode ghost" style="left:620px; top:1290px; width:340px; height:120px; font-size:38px;">ข้อมูลร้าน</div>
-        <div id="ex-c" class="exnode" style="left:330px; top:1560px; width:480px; height:160px; font-size:50px;">ตอบกลับเอง</div>
+        <div class="sec-head" id="c-head">ระบบทำอะไรได้บ้าง</div>
+
+        <div class="row" id="r1" style="top:560px;">
+          <div class="ico"><svg width="66" height="66" viewBox="0 0 24 24" fill="#ff6d8a"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 18a8 8 0 110-16 8 8 0 010 16zm1-13h-2v6l5 3 1-1.7-4-2.3V7z"/></svg></div>
+          <div class="txt">ตอบคำถามอัตโนมัติ<small>ทันที ตลอด 24 ชั่วโมง ทุกวัน</small></div>
+        </div>
+
+        <div class="row" id="r2" style="top:760px;">
+          <div class="ico"><svg width="66" height="66" viewBox="0 0 24 24" fill="#c08bff"><path d="M12 1.6l2.1 6.1 6.3 2.2-6.3 2.2L12 18.2l-2.1-6.1-6.3-2.2 6.3-2.2L12 1.6zm7 12.6l.9 2.5 2.6.9-2.6.9-.9 2.5-.9-2.5-2.6-.9 2.6-.9.9-2.5z"/></svg></div>
+          <div class="txt">เชื่อมต่อกับ AI<small>เช่น ChatGPT ให้คำตอบอัจฉริยะ</small></div>
+        </div>
+
+        <div class="row" id="r3" style="top:960px;">
+          <div class="ico multi">
+            <svg width="46" height="46" viewBox="0 0 24 24" fill="#EA4335"><path id="mark-gmail" d=""/></svg>
+            <svg width="46" height="46" viewBox="0 0 24 24" fill="#34A853"><path id="mark-sheets" d=""/></svg>
+            <svg width="46" height="46" viewBox="0 0 24 24" fill="#0866FF"><path id="mark-msgr" d=""/></svg>
+          </div>
+          <div class="txt">เชื่อมเครื่องมือที่ใช้อยู่<small>Email · Google Sheets · Messenger</small></div>
+        </div>
+
+        <div class="row" id="r4" style="top:1160px;">
+          <div class="ico"><svg width="66" height="66" viewBox="0 0 24 24" fill="#7fd3ff"><path d="M12 12a5 5 0 100-10 5 5 0 000 10zm0 2c-4.4 0-8 2.2-8 5v3h16v-3c0-2.8-3.6-5-8-5z"/></svg></div>
+          <div class="txt">เก็บข้อมูลลูกค้า<small>แล้วส่งต่อให้ทีมขายทันที</small></div>
+        </div>
       </div>
 
-      <!-- ============ 4 · CTA 43.5 - 50.0 ============ -->
-      <div id="cta-clip" class="clip darkbg" data-start="43.5" data-duration="6.5" data-track-index="3">
+      <!-- ===== 3 · RESULTS 37.5 - 45.5 ===== -->
+      <div id="res-clip" class="clip darkbg" data-start="37.5" data-duration="8.0" data-track-index="3">
         <div class="stars"></div>
-        <div id="cta-1">สนใจทักมาคุยได้</div>
+        <div class="sec-head" id="r-head">ผลลัพธ์ที่ได้</div>
+        <div class="res" id="res1" style="top:680px;">
+          <div class="tick">✓</div><div class="txt">ลด Workload ของทีม <b>70%</b></div>
+        </div>
+        <div class="res" id="res2" style="top:870px;">
+          <div class="tick">✓</div><div class="txt">ตอบลูกค้าได้เร็วขึ้น</div>
+        </div>
+        <div class="res" id="res3" style="top:1060px;">
+          <div class="tick">✓</div><div class="txt">เพิ่มยอดขายจากการตอบเร็ว</div>
+        </div>
+      </div>
+
+      <!-- ===== 4 · CTA 45.5 - 50.0 ===== -->
+      <div id="cta-clip" class="clip darkbg" data-start="45.5" data-duration="4.5" data-track-index="4">
+        <div class="stars"></div>
+        <div id="cta-1">พร้อมเพิ่มประสิทธิภาพ<br />การขายแล้วหรือยัง?</div>
         <div id="cta-pill">Fastwork · Anuchakhamsuk</div>
         <div id="cta-2">เริ่มต้น ฿3,000 · ปรึกษาฟรี</div>
       </div>
 
-      <!-- ============ SFX ============ -->
-      <audio id="sfx-in"   src=".media/audio/sfx/sfx_007.mp3" data-start="0.2"  data-duration="2.12" data-volume="0.34" data-track-index="10"></audio>
-      <audio id="sfx-cut1" src=".media/audio/sfx/sfx_002.mp3" data-start="4.85" data-duration="0.57" data-volume="0.3"  data-track-index="11"></audio>
-      <audio id="sfx-cut2" src=".media/audio/sfx/sfx_002.mp3" data-start="28.4" data-duration="0.57" data-volume="0.3"  data-track-index="11"></audio>
-      <audio id="sfx-p1"   src=".media/audio/sfx/sfx_001.mp3" data-start="29.6" data-duration="0.72" data-volume="0.26" data-track-index="10"></audio>
-      <audio id="sfx-p2"   src=".media/audio/sfx/sfx_001.mp3" data-start="31.8" data-duration="0.72" data-volume="0.28" data-track-index="12"></audio>
-      <audio id="sfx-p3"   src=".media/audio/sfx/sfx_004.mp3" data-start="34.4" data-duration="0.37" data-volume="0.22" data-track-index="13"></audio>
-      <audio id="sfx-p4"   src=".media/audio/sfx/sfx_004.mp3" data-start="34.9" data-duration="0.37" data-volume="0.22" data-track-index="14"></audio>
-      <audio id="sfx-p5"   src=".media/audio/sfx/sfx_004.mp3" data-start="35.4" data-duration="0.37" data-volume="0.22" data-track-index="10"></audio>
-      <audio id="sfx-ping" src=".media/audio/sfx/sfx_005.mp3" data-start="38.6" data-duration="1"    data-volume="0.28" data-track-index="12"></audio>
-      <audio id="sfx-cut3" src=".media/audio/sfx/sfx_002.mp3" data-start="43.4" data-duration="0.57" data-volume="0.3"  data-track-index="11"></audio>
-      <audio id="sfx-end"  src=".media/audio/sfx/sfx_007.mp3" data-start="43.6" data-duration="2.12" data-volume="0.34" data-track-index="13"></audio>
+      <!-- ===== SFX ===== -->
+      <audio id="sfx-cut1" src=".media/audio/sfx/sfx_002.mp3" data-start="23.4" data-duration="0.57" data-volume="0.3"  data-track-index="10"></audio>
+      <audio id="sfx-r1"   src=".media/audio/sfx/sfx_001.mp3" data-start="24.9" data-duration="0.72" data-volume="0.26" data-track-index="11"></audio>
+      <audio id="sfx-r2"   src=".media/audio/sfx/sfx_001.mp3" data-start="27.1" data-duration="0.72" data-volume="0.26" data-track-index="12"></audio>
+      <audio id="sfx-r3"   src=".media/audio/sfx/sfx_001.mp3" data-start="29.3" data-duration="0.72" data-volume="0.26" data-track-index="13"></audio>
+      <audio id="sfx-r4"   src=".media/audio/sfx/sfx_001.mp3" data-start="31.5" data-duration="0.72" data-volume="0.26" data-track-index="14"></audio>
+      <audio id="sfx-cut2" src=".media/audio/sfx/sfx_002.mp3" data-start="37.4" data-duration="0.57" data-volume="0.3"  data-track-index="10"></audio>
+      <audio id="sfx-t1"   src=".media/audio/sfx/sfx_005.mp3" data-start="38.9" data-duration="1"    data-volume="0.26" data-track-index="11"></audio>
+      <audio id="sfx-t2"   src=".media/audio/sfx/sfx_005.mp3" data-start="40.2" data-duration="1"    data-volume="0.26" data-track-index="12"></audio>
+      <audio id="sfx-t3"   src=".media/audio/sfx/sfx_005.mp3" data-start="41.5" data-duration="1"    data-volume="0.26" data-track-index="13"></audio>
+      <audio id="sfx-end"  src=".media/audio/sfx/sfx_007.mp3" data-start="45.6" data-duration="2.12" data-volume="0.36" data-track-index="14"></audio>
     </div>
 
-    <script id="brand-data" type="application/json">{
-  "n8n": {
-    "title": "n8n",
-    "hex": "EA4B71",
-    "path": "M21.4737 5.6842c-1.1772 0-2.1663.8051-2.4468 1.8947h-2.8955c-1.235 0-2.289.893-2.492 2.111l-.1038.623a1.263 1.263 0 0 1-1.246 1.0555H11.289c-.2805-1.0896-1.2696-1.8947-2.4468-1.8947s-2.1663.8051-2.4467 1.8947H4.973c-.2805-1.0896-1.2696-1.8947-2.4468-1.8947C1.1311 9.4737 0 10.6047 0 12s1.131 2.5263 2.5263 2.5263c1.1772 0 2.1663-.8051 2.4468-1.8947h1.4223c.2804 1.0896 1.2696 1.8947 2.4467 1.8947 1.1772 0 2.1663-.8051 2.4468-1.8947h1.0008a1.263 1.263 0 0 1 1.2459 1.0555l.1038.623c.203 1.218 1.257 2.111 2.492 2.111h.3692c.2804 1.0895 1.2696 1.8947 2.4468 1.8947 1.3952 0 2.5263-1.131 2.5263-2.5263s-1.131-2.5263-2.5263-2.5263c-1.1772 0-2.1664.805-2.4468 1.8947h-.3692a1.263 1.263 0 0 1-1.246-1.0555l-.1037-.623A2.52 2.52 0 0 0 13.9607 12a2.52 2.52 0 0 0 .821-1.4794l.1038-.623a1.263 1.263 0 0 1 1.2459-1.0555h2.8955c.2805 1.0896 1.2696 1.8947 2.4468 1.8947 1.3952 0 2.5263-1.131 2.5263-2.5263s-1.131-2.5263-2.5263-2.5263m0 1.2632a1.263 1.263 0 0 1 1.2631 1.2631 1.263 1.263 0 0 1-1.2631 1.2632 1.263 1.263 0 0 1-1.2632-1.2632 1.263 1.263 0 0 1 1.2632-1.2631M2.5263 10.7368A1.263 1.263 0 0 1 3.7895 12a1.263 1.263 0 0 1-1.2632 1.2632A1.263 1.263 0 0 1 1.2632 12a1.263 1.263 0 0 1 1.2631-1.2632m6.3158 0A1.263 1.263 0 0 1 10.1053 12a1.263 1.263 0 0 1-1.2632 1.2632A1.263 1.263 0 0 1 7.579 12a1.263 1.263 0 0 1 1.2632-1.2632m10.1053 3.7895a1.263 1.263 0 0 1 1.2631 1.2632 1.263 1.263 0 0 1-1.2631 1.2631 1.263 1.263 0 0 1-1.2632-1.2631 1.263 1.263 0 0 1 1.2632-1.2632"
-  },
-  "line": {
-    "title": "LINE",
-    "hex": "00C300",
-    "path": "M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.282.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"
-  },
-  "gmail": {
-    "title": "Gmail",
-    "hex": "EA4335",
-    "path": "M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z"
-  },
-  "sheets": {
-    "title": "Google Sheets",
-    "hex": "34A853",
-    "path": "M11.318 12.545H7.91v-1.909h3.41v1.91zM14.728 0v6h6l-6-6zm1.363 10.636h-3.41v1.91h3.41v-1.91zm0 3.273h-3.41v1.91h3.41v-1.91zM20.727 6.5v15.864c0 .904-.732 1.636-1.636 1.636H4.909a1.636 1.636 0 0 1-1.636-1.636V1.636C3.273.732 4.005 0 4.909 0h9.318v6.5h6.5zm-3.273 2.773H6.545v7.909h10.91v-7.91zm-6.136 4.636H7.91v1.91h3.41v-1.91z"
-  },
-  "whatsapp": {
-    "title": "WhatsApp",
-    "hex": "25D366",
-    "path": "M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"
-  },
-  "calendar": {
-    "title": "Google Calendar",
-    "hex": "4285F4",
-    "path": "M18.316 5.684H24v12.632h-5.684V5.684zM5.684 24h12.632v-5.684H5.684V24zM18.316 5.684V0H1.895A1.894 1.894 0 0 0 0 1.895v16.421h5.684V5.684h12.632zm-7.207 6.25v-.065c.272-.144.5-.349.687-.617s.279-.595.279-.982c0-.379-.099-.72-.3-1.025a2.05 2.05 0 0 0-.832-.714 2.703 2.703 0 0 0-1.197-.257c-.6 0-1.094.156-1.481.467-.386.311-.65.671-.793 1.078l1.085.452c.086-.249.224-.461.413-.633.189-.172.445-.257.767-.257.33 0 .602.088.816.264a.86.86 0 0 1 .322.703c0 .33-.12.589-.36.778-.24.19-.535.284-.886.284h-.567v1.085h.633c.407 0 .748.109 1.02.327.272.218.407.499.407.843 0 .336-.129.614-.387.832s-.565.327-.924.327c-.351 0-.651-.103-.897-.311-.248-.208-.422-.502-.521-.881l-1.096.452c.178.616.505 1.082.977 1.401.472.319.984.478 1.538.477a2.84 2.84 0 0 0 1.293-.291c.382-.193.684-.458.902-.794.218-.336.327-.72.327-1.149 0-.429-.115-.797-.344-1.105a2.067 2.067 0 0 0-.881-.689zm2.093-1.931l.602.913L15 10.045v5.744h1.187V8.446h-.827l-2.158 1.557zM22.105 0h-3.289v5.184H24V1.895A1.894 1.894 0 0 0 22.105 0zm-3.289 23.5l4.684-4.684h-4.684V23.5zM0 22.105C0 23.152.848 24 1.895 24h3.289v-5.184H0v3.289z"
-  },
-  "shopify": {
-    "title": "Shopify",
-    "hex": "7AB55C",
-    "path": "M15.337 23.979l7.216-1.561s-2.604-17.613-2.625-17.73c-.018-.116-.114-.192-.211-.192s-1.929-.136-1.929-.136-1.275-1.274-1.439-1.411c-.045-.037-.075-.057-.121-.074l-.914 21.104h.023zM11.71 11.305s-.81-.424-1.774-.424c-1.447 0-1.504.906-1.504 1.141 0 1.232 3.24 1.715 3.24 4.629 0 2.295-1.44 3.76-3.406 3.76-2.354 0-3.54-1.465-3.54-1.465l.646-2.086s1.245 1.066 2.28 1.066c.675 0 .975-.545.975-.932 0-1.619-2.654-1.694-2.654-4.359-.034-2.237 1.571-4.416 4.827-4.416 1.257 0 1.875.361 1.875.361l-.945 2.715-.02.01zM11.17.83c.136 0 .271.038.405.135-.984.465-2.064 1.639-2.508 3.992-.656.213-1.293.405-1.889.578C7.697 3.75 8.951.84 11.17.84V.83zm1.235 2.949v.135c-.754.232-1.583.484-2.394.736.466-1.777 1.333-2.645 2.085-2.971.193.501.309 1.176.309 2.1zm.539-2.234c.694.074 1.141.867 1.429 1.755-.349.114-.735.231-1.158.366v-.252c0-.752-.096-1.371-.271-1.871v.002zm2.992 1.289c-.02 0-.06.021-.078.021s-.289.075-.714.21c-.423-1.233-1.176-2.37-2.508-2.37h-.115C12.135.209 11.669 0 11.265 0 8.159 0 6.675 3.877 6.21 5.846c-1.194.365-2.063.636-2.16.674-.675.213-.694.232-.772.87-.075.462-1.83 14.063-1.83 14.063L15.009 24l.927-21.166z"
-  }
-}</script>
+    <script id="brand-data" type="application/json">{"n8n":{"title":"n8n","hex":"EA4B71","path":"M21.4737 5.6842c-1.1772 0-2.1663.8051-2.4468 1.8947h-2.8955c-1.235 0-2.289.893-2.492 2.111l-.1038.623a1.263 1.263 0 0 1-1.246 1.0555H11.289c-.2805-1.0896-1.2696-1.8947-2.4468-1.8947s-2.1663.8051-2.4467 1.8947H4.973c-.2805-1.0896-1.2696-1.8947-2.4468-1.8947C1.1311 9.4737 0 10.6047 0 12s1.131 2.5263 2.5263 2.5263c1.1772 0 2.1663-.8051 2.4468-1.8947h1.4223c.2804 1.0896 1.2696 1.8947 2.4467 1.8947 1.1772 0 2.1663-.8051 2.4468-1.8947h1.0008a1.263 1.263 0 0 1 1.2459 1.0555l.1038.623c.203 1.218 1.257 2.111 2.492 2.111h.3692c.2804 1.0895 1.2696 1.8947 2.4468 1.8947 1.3952 0 2.5263-1.131 2.5263-2.5263s-1.131-2.5263-2.5263-2.5263c-1.1772 0-2.1664.805-2.4468 1.8947h-.3692a1.263 1.263 0 0 1-1.246-1.0555l-.1037-.623A2.52 2.52 0 0 0 13.9607 12a2.52 2.52 0 0 0 .821-1.4794l.1038-.623a1.263 1.263 0 0 1 1.2459-1.0555h2.8955c.2805 1.0896 1.2696 1.8947 2.4468 1.8947 1.3952 0 2.5263-1.131 2.5263-2.5263s-1.131-2.5263-2.5263-2.5263m0 1.2632a1.263 1.263 0 0 1 1.2631 1.2631 1.263 1.263 0 0 1-1.2631 1.2632 1.263 1.263 0 0 1-1.2632-1.2632 1.263 1.263 0 0 1 1.2632-1.2631M2.5263 10.7368A1.263 1.263 0 0 1 3.7895 12a1.263 1.263 0 0 1-1.2632 1.2632A1.263 1.263 0 0 1 1.2632 12a1.263 1.263 0 0 1 1.2631-1.2632m6.3158 0A1.263 1.263 0 0 1 10.1053 12a1.263 1.263 0 0 1-1.2632 1.2632A1.263 1.263 0 0 1 7.579 12a1.263 1.263 0 0 1 1.2632-1.2632m10.1053 3.7895a1.263 1.263 0 0 1 1.2631 1.2632 1.263 1.263 0 0 1-1.2631 1.2631 1.263 1.263 0 0 1-1.2632-1.2631 1.263 1.263 0 0 1 1.2632-1.2632"},"gmail":{"title":"Gmail","hex":"EA4335","path":"M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z"},"sheets":{"title":"Google Sheets","hex":"34A853","path":"M11.318 12.545H7.91v-1.909h3.41v1.91zM14.728 0v6h6l-6-6zm1.363 10.636h-3.41v1.91h3.41v-1.91zm0 3.273h-3.41v1.91h3.41v-1.91zM20.727 6.5v15.864c0 .904-.732 1.636-1.636 1.636H4.909a1.636 1.636 0 0 1-1.636-1.636V1.636C3.273.732 4.005 0 4.909 0h9.318v6.5h6.5zm-3.273 2.773H6.545v7.909h10.91v-7.91zm-6.136 4.636H7.91v1.91h3.41v-1.91z"},"messenger":{"title":"Messenger","hex":"0866FF","path":"M12 0C5.24 0 0 4.952 0 11.64c0 3.499 1.434 6.521 3.769 8.61a.96.96 0 0 1 .323.683l.065 2.135a.96.96 0 0 0 1.347.85l2.381-1.053a.96.96 0 0 1 .641-.046A13 13 0 0 0 12 23.28c6.76 0 12-4.952 12-11.64S18.76 0 12 0m6.806 7.44c.522-.03.971.567.63 1.094l-4.178 6.457a.707.707 0 0 1-.977.208l-3.87-2.504a.44.44 0 0 0-.49.007l-4.363 3.01c-.637.438-1.415-.317-.995-.966l4.179-6.457a.706.706 0 0 1 .977-.21l3.87 2.505c.15.097.344.094.491-.007l4.362-3.008a.7.7 0 0 1 .364-.13"}}</script>
     <script>
       window.__timelines = window.__timelines || {};
       var tl = gsap.timeline({ paused: true });
 
-      /* official n8n mark, shared by the intro and the brand bar */
-      var BRANDS = JSON.parse(document.getElementById("brand-data").textContent);
-      document.getElementById("n8n-path").setAttribute("d", BRANDS.n8n.path);
-      document.getElementById("n8n-path-2").setAttribute("d", BRANDS.n8n.path);
+      var B = JSON.parse(document.getElementById("brand-data").textContent);
+      document.getElementById("mark-bar").setAttribute("d", B.n8n.path);
+      document.getElementById("mark-gmail").setAttribute("d", B.gmail.path);
+      document.getElementById("mark-sheets").setAttribute("d", B.sheets.path);
+      document.getElementById("mark-msgr").setAttribute("d", B.messenger.path);
 
       function rise(sel, at, dur, dist) {
-        tl.fromTo(sel, { y: dist || 34, opacity: 0 },
+        tl.fromTo(sel, { y: dist === undefined ? 34 : dist, opacity: 0 },
           { y: 0, opacity: 1, duration: dur || 0.5, ease: "power3.out" }, at);
       }
       function pop(sel, at, dur) {
         gsap.set(sel, { transformOrigin: "50% 50%" });
-        tl.fromTo(sel, { scale: 0.55, opacity: 0 },
-          { scale: 1, opacity: 1, duration: dur || 0.5, ease: "back.out(1.9)" }, at);
+        tl.fromTo(sel, { scale: 0.6, opacity: 0 },
+          { scale: 1, opacity: 1, duration: dur || 0.5, ease: "back.out(1.8)" }, at);
       }
-      function draw(sel, at, dur) {
-        var el = document.querySelector(sel), len = el.getTotalLength();
-        gsap.set(el, { strokeDasharray: len, strokeDashoffset: len });
-        tl.to(el, { strokeDashoffset: 0, duration: dur, ease: "power2.inOut", overwrite: "auto" }, at);
-      }
-      function packet(sel, at, dur) {
-        var el = document.querySelector(sel), len = el.getTotalLength();
-        gsap.set(el, { strokeDasharray: "120 " + len, strokeDashoffset: 120 });
-        tl.set(el, { opacity: 1 }, at);
-        tl.fromTo(el, { strokeDashoffset: 120 },
-          { strokeDashoffset: -len, duration: dur, ease: "power1.inOut", overwrite: "auto" }, at);
-        tl.set(el, { opacity: 0 }, at + dur);
+      /* a caption holds, then clears before the next one arrives */
+      function caption(sel, inAt, outAt) {
+        tl.fromTo(sel, { y: 26, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.4, ease: "power3.out" }, inAt);
+        tl.to(sel, { opacity: 0, duration: 0.3, ease: "power2.in" }, outAt);
+        tl.set(sel, { opacity: 0 }, outAt + 0.32);
       }
 
-      /* ===== 1 · intro (0 - 5.0) ===== */
-      pop("#intro-mark", 0.25, 0.6);
-      rise("#intro-1", 0.75, 0.45, 24);
-      rise("#intro-2", 1.05, 0.55);
-      rise("#intro-3", 1.5, 0.45, 22);
-      tl.to(["#intro-mark", "#intro-1", "#intro-2", "#intro-3"],
-        { opacity: 0, duration: 0.3, ease: "power2.in" }, 4.6);
-      tl.set(["#intro-mark", "#intro-1", "#intro-2", "#intro-3"], { opacity: 0 }, 5.0);
+      /* ===== 1 · the take ===== */
+      rise("#brandbar", 0.4, 0.5, -26);
+      rise("#lower", 1.2, 0.55, 30);
+      tl.to("#lower", { opacity: 0, duration: 0.4, ease: "power2.in" }, 6.4);
+      tl.set("#lower", { opacity: 0 }, 6.8);
 
-      /* ===== 2 · the footage (5.0 - 28.5) ===== */
-      rise("#brandbar", 5.4, 0.5, -26);
-      rise("#lower", 6.2, 0.55, 30);
-      tl.to("#lower", { opacity: 0, duration: 0.4, ease: "power2.in" }, 11.5);
-      tl.set("#lower", { opacity: 0 }, 12.0);
-      /* the brand bar rides the whole take */
-      tl.to("#brandbar", { opacity: 0, duration: 0.35, ease: "power2.in" }, 27.9);
-      tl.set("#brandbar", { opacity: 0 }, 28.5);
+      caption("#cap-1", 0.6, 6.6);
+      caption("#cap-2", 7.4, 13.4);
+      caption("#cap-3", 14.2, 22.4);
 
-      /* ===== 3 · explainer (28.5 - 43.5) ===== */
-      rise("#ex-head", 28.9, 0.5);
-      pop("#ex-a", 29.6, 0.5);
-      draw("#w-ab", 30.4, 0.6); draw("#w-ab2", 30.4, 0.6);
-      pop("#ex-b", 31.8, 0.55);
-      draw("#w-bs1", 33.6, 0.5); draw("#w-bs2", 33.8, 0.5); draw("#w-bs3", 34.0, 0.5);
-      pop("#ex-s1", 34.4, 0.45);
-      pop("#ex-s2", 34.9, 0.45);
-      pop("#ex-s3", 35.4, 0.45);
-      draw("#w-bc", 36.4, 0.8); draw("#w-bc2", 36.4, 0.8);
-      pop("#ex-c", 37.6, 0.55);
-      packet("#p-ab", 38.6, 0.9);
-      packet("#p-bc", 39.6, 1.2);
-      tl.to(["#ex-head", "#ex-a", "#ex-b", "#ex-s1", "#ex-s2", "#ex-s3", "#ex-c",
-             "#w-ab", "#w-ab2", "#w-bs1", "#w-bs2", "#w-bs3", "#w-bc", "#w-bc2"],
-        { opacity: 0, duration: 0.35, ease: "power2.in" }, 43.0);
-      tl.set(["#ex-head", "#ex-a", "#ex-b", "#ex-s1", "#ex-s2", "#ex-s3", "#ex-c",
-              "#w-ab", "#w-ab2", "#w-bs1", "#w-bs2", "#w-bs3", "#w-bc", "#w-bc2"],
-        { opacity: 0 }, 43.5);
+      tl.to("#brandbar", { opacity: 0, duration: 0.35, ease: "power2.in" }, 22.9);
+      tl.set("#brandbar", { opacity: 0 }, 23.5);
 
-      /* ===== 4 · CTA (43.5 - 50.0) ===== */
-      rise("#cta-1", 43.9, 0.5);
-      pop("#cta-pill", 44.5, 0.6);
-      rise("#cta-2", 45.3, 0.45, 22);
+      /* ===== 2 · capabilities ===== */
+      rise("#c-head", 23.9, 0.5);
+      rise("#r1", 24.9, 0.5, 40);
+      rise("#r2", 27.1, 0.5, 40);
+      rise("#r3", 29.3, 0.5, 40);
+      rise("#r4", 31.5, 0.5, 40);
+      tl.to(["#c-head", "#r1", "#r2", "#r3", "#r4"],
+        { opacity: 0, duration: 0.35, ease: "power2.in" }, 37.0);
+      tl.set(["#c-head", "#r1", "#r2", "#r3", "#r4"], { opacity: 0 }, 37.5);
+
+      /* ===== 3 · results ===== */
+      rise("#r-head", 37.9, 0.5);
+      pop("#res1", 38.9, 0.5);
+      pop("#res2", 40.2, 0.5);
+      pop("#res3", 41.5, 0.5);
+      tl.to(["#r-head", "#res1", "#res2", "#res3"],
+        { opacity: 0, duration: 0.35, ease: "power2.in" }, 45.0);
+      tl.set(["#r-head", "#res1", "#res2", "#res3"], { opacity: 0 }, 45.5);
+
+      /* ===== 4 · CTA ===== */
+      rise("#cta-1", 45.9, 0.5);
+      pop("#cta-pill", 46.6, 0.6);
+      rise("#cta-2", 47.4, 0.45, 22);
 
       tl.seek(0);
       window.__timelines["main"] = tl;
