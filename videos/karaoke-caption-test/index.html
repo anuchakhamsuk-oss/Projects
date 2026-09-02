@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="vendor/gsap.min.js"></script>
+    <style>
+      @font-face {
+        font-family: "Noto Sans Thai";
+        font-weight: 900;
+        font-style: normal;
+        src: url("assets/fonts/notosansthai-900-thai.woff2") format("woff2");
+        unicode-range: U+0E01-0E5B, U+200C-200D, U+25CC;
+      }
+      @font-face {
+        font-family: "Noto Sans Thai";
+        font-weight: 900;
+        font-style: normal;
+        src: url("assets/fonts/notosansthai-900-latin.woff2") format("woff2");
+        unicode-range: U+0000-00FF, U+2000-206F;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        background: #000;
+      }
+      body {
+        font-family: "Inter", sans-serif;
+      }
+
+      .clip {
+        position: absolute;
+        inset: 0;
+      }
+
+      .word-cap {
+        position: absolute;
+        left: 90px;
+        top: 1320px;
+        right: auto;
+        bottom: auto;
+        width: max-content;
+        height: max-content;
+        font-family: "Noto Sans Thai", sans-serif;
+        font-weight: 900;
+        font-size: 132px;
+        line-height: 1;
+        color: #ffffff;
+        white-space: nowrap;
+        opacity: 0;
+        transform-origin: left center;
+        text-shadow:
+          0 6px 18px rgba(0, 0, 0, 0.55),
+          0 0 3px rgba(0, 0, 0, 0.85),
+          0 0 40px rgba(0, 0, 0, 0.35);
+        -webkit-text-stroke: 3px rgba(0, 0, 0, 0.25);
+        paint-order: stroke fill;
+        will-change: transform, opacity, color;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="8.69"
+      data-width="1080"
+      data-height="1920"
+    >
+      <video
+        id="a-roll"
+        class="clip"
+        src="683f7b04-VID20260902132458.mp4"
+        muted
+        playsinline
+        data-start="0"
+        data-duration="8.69"
+        data-track-index="0"
+        style="width: 100%; height: 100%; object-fit: cover"
+      ></video>
+      <audio
+        id="a-roll-audio"
+        src="683f7b04-VID20260902132458.mp4"
+        data-start="0"
+        data-duration="8.69"
+        data-track-index="2"
+        data-volume="1"
+      ></audio>
+
+      <!-- Karaoke word captions: white while spoken, run off right + turn yellow on exit.
+           The outer div is the timed `.clip` the framework owns visibility for;
+           the inner span is what GSAP animates (transform on a `.clip` element itself
+           is reset by the framework's own track positioning, so motion must live inside). -->
+      <div id="wrap-w1" class="clip" data-layout-allow-overflow="true" data-start="1.40" data-duration="0.48"><span id="w1" class="word-cap">ฮัลโหล</span></div>
+      <div id="wrap-w2" class="clip" data-layout-allow-overflow="true" data-start="1.80" data-duration="0.55"><span id="w2" class="word-cap">test</span></div>
+      <div id="wrap-w3" class="clip" data-layout-allow-overflow="true" data-start="2.27" data-duration="0.57"><span id="w3" class="word-cap">test</span></div>
+      <div id="wrap-w4" class="clip" data-layout-allow-overflow="true" data-start="2.76" data-duration="0.67"><span id="w4" class="word-cap">123</span></div>
+      <div id="wrap-w5" class="clip" data-layout-allow-overflow="true" data-start="3.35" data-duration="0.50"><span id="w5" class="word-cap">ฮัลโหล</span></div>
+      <div id="wrap-w6" class="clip" data-layout-allow-overflow="true" data-start="3.77" data-duration="0.46"><span id="w6" class="word-cap">test</span></div>
+      <div id="wrap-w7" class="clip" data-layout-allow-overflow="true" data-start="4.15" data-duration="0.63"><span id="w7" class="word-cap">test</span></div>
+      <div id="wrap-w8" class="clip" data-layout-allow-overflow="true" data-start="4.70" data-duration="0.93"><span id="w8" class="word-cap">1</span></div>
+      <div id="wrap-w9" class="clip" data-layout-allow-overflow="true" data-start="5.93" data-duration="0.43"><span id="w9" class="word-cap">2</span></div>
+      <div id="wrap-w10" class="clip" data-layout-allow-overflow="true" data-start="6.28" data-duration="1.03"><span id="w10" class="word-cap">3</span></div>
+
+      <!-- Whoosh SFX, one per word exit -->
+      <audio id="sfx1" src=".media/audio/sfx/sfx_002.mp3" data-start="1.62" data-duration="0.6" data-track-index="3" data-volume="0.55"></audio>
+      <audio id="sfx2" src=".media/audio/sfx/sfx_002.mp3" data-start="2.05" data-duration="0.6" data-track-index="4" data-volume="0.55"></audio>
+      <audio id="sfx3" src=".media/audio/sfx/sfx_002.mp3" data-start="2.54" data-duration="0.6" data-track-index="5" data-volume="0.55"></audio>
+      <audio id="sfx4" src=".media/audio/sfx/sfx_002.mp3" data-start="3.08" data-duration="0.6" data-track-index="6" data-volume="0.55"></audio>
+      <audio id="sfx5" src=".media/audio/sfx/sfx_002.mp3" data-start="3.58" data-duration="0.6" data-track-index="7" data-volume="0.55"></audio>
+      <audio id="sfx6" src=".media/audio/sfx/sfx_002.mp3" data-start="3.97" data-duration="0.6" data-track-index="8" data-volume="0.55"></audio>
+      <audio id="sfx7" src=".media/audio/sfx/sfx_002.mp3" data-start="4.45" data-duration="0.6" data-track-index="9" data-volume="0.55"></audio>
+      <audio id="sfx8" src=".media/audio/sfx/sfx_002.mp3" data-start="5.15" data-duration="0.6" data-track-index="10" data-volume="0.55"></audio>
+      <audio id="sfx9" src=".media/audio/sfx/sfx_002.mp3" data-start="6.11" data-duration="0.6" data-track-index="11" data-volume="0.55"></audio>
+      <audio id="sfx10" src=".media/audio/sfx/sfx_002.mp3" data-start="6.78" data-duration="0.6" data-track-index="12" data-volume="0.55"></audio>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+
+      // Each word: [id, start, holdDur, exitDur]
+      const words = [
+        ["w1", 1.4, 0.22, 0.18],
+        ["w2", 1.8, 0.25, 0.22],
+        ["w3", 2.27, 0.27, 0.22],
+        ["w4", 2.76, 0.32, 0.27],
+        ["w5", 3.35, 0.23, 0.19],
+        ["w6", 3.77, 0.2, 0.18],
+        ["w7", 4.15, 0.3, 0.25],
+        ["w8", 4.7, 0.45, 0.4],
+        ["w9", 5.93, 0.18, 0.17],
+        ["w10", 6.28, 0.5, 0.45],
+      ];
+
+      const ENTRANCE = 0.08;
+      const EXIT_X = 1400; // travels fully off the 1080px-wide frame
+
+      words.forEach(([id, start, hold, exit]) => {
+        const sel = "#" + id;
+
+        // Entrance: pop in white
+        tl.fromTo(
+          sel,
+          { opacity: 0, scale: 0.72, x: 0, color: "#ffffff" },
+          { opacity: 1, scale: 1, x: 0, color: "#ffffff", duration: ENTRANCE, ease: "back.out(1.8)" },
+          start,
+        );
+
+        // Exit: run off to the right, turn yellow
+        tl.to(
+          sel,
+          {
+            x: EXIT_X,
+            color: "#ffd600",
+            opacity: 0,
+            scale: 0.92,
+            duration: exit,
+            ease: "power2.out",
+          },
+          start + ENTRANCE + hold,
+        );
+
+        // Reset off-timeline so re-seeks before `start` show it hidden
+        tl.set(sel, { opacity: 0, x: 0, color: "#ffffff" }, start + ENTRANCE + hold + exit);
+      });
+
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>
