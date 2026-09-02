@@ -100,49 +100,68 @@
            The outer div is the timed `.clip` the framework owns visibility for;
            the inner span is what GSAP animates (transform on a `.clip` element itself
            is reset by the framework's own track positioning, so motion must live inside). -->
-      <div id="wrap-w1" class="clip" data-layout-allow-overflow="true" data-start="1.40" data-duration="0.48"><span id="w1" class="word-cap">ฮัลโหล</span></div>
-      <div id="wrap-w2" class="clip" data-layout-allow-overflow="true" data-start="1.80" data-duration="0.55"><span id="w2" class="word-cap">test</span></div>
-      <div id="wrap-w3" class="clip" data-layout-allow-overflow="true" data-start="2.27" data-duration="0.57"><span id="w3" class="word-cap">test</span></div>
-      <div id="wrap-w4" class="clip" data-layout-allow-overflow="true" data-start="2.76" data-duration="0.67"><span id="w4" class="word-cap">123</span></div>
-      <div id="wrap-w5" class="clip" data-layout-allow-overflow="true" data-start="3.35" data-duration="0.50"><span id="w5" class="word-cap">ฮัลโหล</span></div>
-      <div id="wrap-w6" class="clip" data-layout-allow-overflow="true" data-start="3.77" data-duration="0.46"><span id="w6" class="word-cap">test</span></div>
-      <div id="wrap-w7" class="clip" data-layout-allow-overflow="true" data-start="4.15" data-duration="0.63"><span id="w7" class="word-cap">test</span></div>
-      <div id="wrap-w8" class="clip" data-layout-allow-overflow="true" data-start="4.70" data-duration="0.93"><span id="w8" class="word-cap">1</span></div>
-      <div id="wrap-w9" class="clip" data-layout-allow-overflow="true" data-start="5.93" data-duration="0.43"><span id="w9" class="word-cap">2</span></div>
-      <div id="wrap-w10" class="clip" data-layout-allow-overflow="true" data-start="6.28" data-duration="1.03"><span id="w10" class="word-cap">3</span></div>
+      <div id="wrap-w1" class="clip" data-layout-allow-overflow="true" data-start="1.40" data-duration="0.72"><span id="w1" class="word-cap">ฮัลโหล</span></div>
+      <div id="wrap-w2" class="clip" data-layout-allow-overflow="true" data-start="1.80" data-duration="0.79"><span id="w2" class="word-cap">test</span></div>
+      <div id="wrap-w3" class="clip" data-layout-allow-overflow="true" data-start="2.27" data-duration="0.81"><span id="w3" class="word-cap">test</span></div>
+      <div id="wrap-w4" class="clip" data-layout-allow-overflow="true" data-start="2.76" data-duration="0.91"><span id="w4" class="word-cap">123</span></div>
+      <div id="wrap-w5" class="clip" data-layout-allow-overflow="true" data-start="3.35" data-duration="0.74"><span id="w5" class="word-cap">ฮัลโหล</span></div>
+      <div id="wrap-w6" class="clip" data-layout-allow-overflow="true" data-start="3.77" data-duration="0.70"><span id="w6" class="word-cap">test</span></div>
+      <div id="wrap-w7" class="clip" data-layout-allow-overflow="true" data-start="4.15" data-duration="0.87"><span id="w7" class="word-cap">test</span></div>
+      <div id="wrap-w8" class="clip" data-layout-allow-overflow="true" data-start="4.70" data-duration="1.55"><span id="w8" class="word-cap">1</span></div>
+      <div id="wrap-w9" class="clip" data-layout-allow-overflow="true" data-start="5.93" data-duration="0.67"><span id="w9" class="word-cap">2</span></div>
+      <div id="wrap-w10" class="clip" data-layout-allow-overflow="true" data-start="6.28" data-duration="1.85"><span id="w10" class="word-cap">3</span></div>
 
-      <!-- Whoosh SFX, one per word exit -->
-      <audio id="sfx1" src=".media/audio/sfx/sfx_002.mp3" data-start="1.62" data-duration="0.6" data-track-index="3" data-volume="0.55"></audio>
-      <audio id="sfx2" src=".media/audio/sfx/sfx_002.mp3" data-start="2.05" data-duration="0.6" data-track-index="4" data-volume="0.55"></audio>
-      <audio id="sfx3" src=".media/audio/sfx/sfx_002.mp3" data-start="2.54" data-duration="0.6" data-track-index="5" data-volume="0.55"></audio>
-      <audio id="sfx4" src=".media/audio/sfx/sfx_002.mp3" data-start="3.08" data-duration="0.6" data-track-index="6" data-volume="0.55"></audio>
-      <audio id="sfx5" src=".media/audio/sfx/sfx_002.mp3" data-start="3.58" data-duration="0.6" data-track-index="7" data-volume="0.55"></audio>
-      <audio id="sfx6" src=".media/audio/sfx/sfx_002.mp3" data-start="3.97" data-duration="0.6" data-track-index="8" data-volume="0.55"></audio>
-      <audio id="sfx7" src=".media/audio/sfx/sfx_002.mp3" data-start="4.45" data-duration="0.6" data-track-index="9" data-volume="0.55"></audio>
-      <audio id="sfx8" src=".media/audio/sfx/sfx_002.mp3" data-start="5.15" data-duration="0.6" data-track-index="10" data-volume="0.55"></audio>
-      <audio id="sfx9" src=".media/audio/sfx/sfx_002.mp3" data-start="6.11" data-duration="0.6" data-track-index="11" data-volume="0.55"></audio>
-      <audio id="sfx10" src=".media/audio/sfx/sfx_002.mp3" data-start="6.78" data-duration="0.6" data-track-index="12" data-volume="0.55"></audio>
+      <!-- Bass anchor under the opening, soft chime on the sign-off -->
+      <audio id="sfx-open" src=".media/audio/sfx/sfx_004.mp3" data-start="1.28" data-duration="2.1" data-track-index="3" data-volume="0.30"></audio>
+      <audio id="sfx-close" src=".media/audio/sfx/sfx_005.mp3" data-start="7.62" data-duration="1.07" data-track-index="4" data-volume="0.32"></audio>
+
+      <!-- Pop on each word entrance -->
+      <audio id="pop1" src=".media/audio/sfx/sfx_001.mp3" data-start="1.40" data-duration="0.7" data-track-index="5" data-volume="0.42"></audio>
+      <audio id="pop2" src=".media/audio/sfx/sfx_001.mp3" data-start="1.80" data-duration="0.7" data-track-index="6" data-volume="0.42"></audio>
+      <audio id="pop3" src=".media/audio/sfx/sfx_001.mp3" data-start="2.27" data-duration="0.7" data-track-index="7" data-volume="0.42"></audio>
+      <audio id="pop4" src=".media/audio/sfx/sfx_001.mp3" data-start="2.76" data-duration="0.7" data-track-index="8" data-volume="0.42"></audio>
+      <audio id="pop5" src=".media/audio/sfx/sfx_001.mp3" data-start="3.35" data-duration="0.7" data-track-index="9" data-volume="0.42"></audio>
+      <audio id="pop6" src=".media/audio/sfx/sfx_001.mp3" data-start="3.77" data-duration="0.7" data-track-index="10" data-volume="0.42"></audio>
+      <audio id="pop7" src=".media/audio/sfx/sfx_001.mp3" data-start="4.15" data-duration="0.7" data-track-index="11" data-volume="0.42"></audio>
+      <audio id="pop8" src=".media/audio/sfx/sfx_001.mp3" data-start="4.70" data-duration="0.7" data-track-index="12" data-volume="0.42"></audio>
+      <audio id="pop9" src=".media/audio/sfx/sfx_001.mp3" data-start="5.93" data-duration="0.7" data-track-index="13" data-volume="0.42"></audio>
+      <audio id="pop10" src=".media/audio/sfx/sfx_001.mp3" data-start="6.28" data-duration="0.7" data-track-index="14" data-volume="0.42"></audio>
+
+      <!-- Whoosh as each word runs off to the right -->
+      <audio id="sfx1" src=".media/audio/sfx/sfx_002.mp3" data-start="1.72" data-duration="0.6" data-track-index="15" data-volume="0.38"></audio>
+      <audio id="sfx2" src=".media/audio/sfx/sfx_002.mp3" data-start="2.19" data-duration="0.6" data-track-index="16" data-volume="0.38"></audio>
+      <audio id="sfx3" src=".media/audio/sfx/sfx_002.mp3" data-start="2.68" data-duration="0.6" data-track-index="17" data-volume="0.38"></audio>
+      <audio id="sfx4" src=".media/audio/sfx/sfx_002.mp3" data-start="3.27" data-duration="0.6" data-track-index="18" data-volume="0.38"></audio>
+      <audio id="sfx5" src=".media/audio/sfx/sfx_002.mp3" data-start="3.69" data-duration="0.6" data-track-index="19" data-volume="0.38"></audio>
+      <audio id="sfx6" src=".media/audio/sfx/sfx_002.mp3" data-start="4.07" data-duration="0.6" data-track-index="20" data-volume="0.38"></audio>
+      <audio id="sfx7" src=".media/audio/sfx/sfx_002.mp3" data-start="4.62" data-duration="0.6" data-track-index="21" data-volume="0.38"></audio>
+      <audio id="sfx8" src=".media/audio/sfx/sfx_002.mp3" data-start="5.85" data-duration="0.6" data-track-index="22" data-volume="0.38"></audio>
+      <audio id="sfx9" src=".media/audio/sfx/sfx_002.mp3" data-start="6.20" data-duration="0.6" data-track-index="23" data-volume="0.38"></audio>
+      <audio id="sfx10" src=".media/audio/sfx/sfx_002.mp3" data-start="7.65" data-duration="0.6" data-track-index="24" data-volume="0.42"></audio>
     </div>
 
     <script>
       window.__timelines = window.__timelines || {};
       const tl = gsap.timeline({ paused: true });
 
-      // Each word: [id, start, holdDur, exitDur]
+      // Each word: [id, start, holdDur, exitDur].
+      // Hold runs until just before the next word is spoken, so a word lingers
+      // instead of flashing; the exit overlaps the next word's entrance slightly,
+      // which is what makes the hand-off read as a chase rather than a cut.
       const words = [
-        ["w1", 1.4, 0.22, 0.18],
-        ["w2", 1.8, 0.25, 0.22],
-        ["w3", 2.27, 0.27, 0.22],
-        ["w4", 2.76, 0.32, 0.27],
-        ["w5", 3.35, 0.23, 0.19],
-        ["w6", 3.77, 0.2, 0.18],
-        ["w7", 4.15, 0.3, 0.25],
-        ["w8", 4.7, 0.45, 0.4],
-        ["w9", 5.93, 0.18, 0.17],
-        ["w10", 6.28, 0.5, 0.45],
+        ["w1", 1.4, 0.2, 0.4],
+        ["w2", 1.8, 0.27, 0.4],
+        ["w3", 2.27, 0.29, 0.4],
+        ["w4", 2.76, 0.39, 0.4],
+        ["w5", 3.35, 0.22, 0.4],
+        ["w6", 3.77, 0.18, 0.4],
+        ["w7", 4.15, 0.35, 0.4],
+        ["w8", 4.7, 1.03, 0.4],
+        ["w9", 5.93, 0.15, 0.4],
+        ["w10", 6.28, 1.25, 0.48],
       ];
 
-      const ENTRANCE = 0.08;
+      const ENTRANCE = 0.12;
       const EXIT_X = 1400; // travels fully off the 1080px-wide frame
 
       words.forEach(([id, start, hold, exit]) => {

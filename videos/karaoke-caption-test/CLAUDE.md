@@ -98,3 +98,32 @@ Fix all errors before presenting the result. Warnings should be reviewed before 
 4. Videos use `muted` with a separate `<audio>` element for the audio track
 5. Sub-compositions use `data-composition-src="compositions/file.html"` to reference other HTML files
 6. Only deterministic logic — no `Date.now()`, no `Math.random()`, no network fetches
+
+## Notes on this cut
+
+- Source is a 8.7s vertical phone selfie (OPPO front camera). The file carries a
+  `rotation=-90` display matrix that `init`'s transcode dropped without baking
+  into pixels, so the first render came out sideways. The project's
+  `683f7b04-VID20260902132458.mp4` has been re-transcoded from the upload with
+  `transpose=2`, i.e. the rotation is now in the pixels and there is no display
+  matrix left to honour. Re-importing the raw upload would reintroduce the bug.
+- Nothing here can transcribe Thai (`init`'s transcription 403s, whisper's Thai
+  model is out of reach), so the caption text is the script the author supplied
+  by hand, not a verified transcript. Word start times were derived from
+  `ffmpeg silencedetect` speech-gap boundaries at -22dB/d=0.08, then mapped onto
+  the supplied word order. They track the delivery closely but are not
+  word-aligned ASR output.
+- Caption motion lives on the inner `<span>`, never on the timed `.clip`
+  wrapper: the framework owns transform on clip elements, so animating `x` there
+  is silently discarded (colour and opacity still animate, which makes the bug
+  look like "the exit does nothing but recolour").
+- Exit uses `power2.out`. `power2.in` was tried first and reads as a dead hold
+  followed by a one-frame snap — the travel has to be front-loaded to be seen.
+- Each word holds until ~0.08s before the next word is spoken, so the exit
+  overlaps the next entrance. That overlap is the effect, not a collision.
+- **No background music.** BGM needs either a HeyGen sign-in
+  (`npx hyperframes auth login`) or the local MusicGen deps (`pip install
+  transformers torch soundfile numpy`); neither is available here, and
+  `media-use` explicitly forbids silently substituting a local generate. The
+  SFX bed (bass anchor, per-word pop, per-word whoosh, closing chime) carries
+  the piece in the meantime.
