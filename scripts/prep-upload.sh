@@ -5,9 +5,15 @@
 # second (1080p-class HEVC at ~11 Mbps), so roughly 22 seconds of raw recording
 # fills it. This script gets a longer clip under the ceiling.
 #
+#   ./prep-upload.sh proxy    in.mp4              # whole clip, tiny, for surveying
+#   ./prep-upload.sh cut      in.mp4 START END     # lossless extract of one range
 #   ./prep-upload.sh compress in.mp4 [target_MB]   # re-encode to fit (default 28)
 #   ./prep-upload.sh split    in.mp4 [chunk_MB]    # lossless split when compressing isn't enough
 #   ./prep-upload.sh join     part_000.mp4 out.mp4 # rejoin split parts
+#
+# For anything long, send a proxy first: a 10-minute recording is ~825 MB raw but
+# ~25 MB as a proxy, so it fits one upload. Pick the moments off that, then send
+# just those ranges with `cut` at full quality.
 #
 # compress bakes any rotation metadata into the pixels. Phone videos carry a
 # display matrix that some tools honour and others drop; leaving it in the
@@ -63,6 +69,43 @@ print(max(300, int((t*8192*0.94)/d) - $audio_kbps))
   echo "wrote $out ($(( $(stat -c%s "$out") / 1048576 )) MB)"
 }
 
+cmd_proxy() {
+  local in="$1" target_mb="${2:-24}" out dur vf kbps
+  [ -f "$in" ] || die "no such file: $in"
+  out="${in%.*}-proxy.mp4"
+  dur=$(duration_of "$in")
+
+  # Audio stays at 128k STEREO on purpose. The video here is only meant to be
+  # looked at, but the audio is what speech/pause timing is read from, and a
+  # mono downmix at a low rate fills the quiet moments with coding noise —
+  # measured on this project's own footage, mono lost 3 of 11 real pauses while
+  # 128k stereo kept all 11. Audio is a few MB either way; video absorbs the cut.
+  kbps=$(python3 -c "
+d=float('$dur'); t=float('$target_mb')
+print(max(120, int((t*8192*0.92)/d) - 128))
+")
+  vf=$(rotation_filter "$in")
+  vf="${vf:+$vf,}scale=-2:480"
+  echo "proxy: ${dur}s at ${kbps}k video + 128k stereo audio (target ${target_mb} MB)"
+  ffmpeg -y -i "$in" -vf "$vf" -c:v libx264 -preset veryfast -b:v "${kbps}k" \
+    -maxrate "$((kbps*3/2))k" -bufsize "$((kbps*3))k" -r 15 \
+    -c:a aac -b:a 128k -ac 2 -movflags +faststart -metadata:s:v rotate=0 \
+    "$out" -loglevel error
+  echo "wrote $out ($(( $(stat -c%s "$out") / 1048576 )) MB) — timecodes match the original"
+}
+
+cmd_cut() {
+  local in="$1" start="$2" end="$3" out="${4:-}"
+  [ -f "$in" ] || die "no such file: $in"
+  [ -n "${end:-}" ] || die "usage: cut in.mp4 START END [out.mp4]  (e.g. cut clip.mp4 00:03:20 00:04:05)"
+  out="${out:-${in%.*}-cut.mp4}"
+  # Seek before -i so the copy starts at the nearest keyframe at or before START.
+  ffmpeg -y -ss "$start" -to "$end" -i "$in" -c copy -movflags +faststart "$out" -loglevel error
+  echo "wrote $out ($(( $(stat -c%s "$out") / 1048576 )) MB, $(duration_of "$out")s)"
+  echo "note: -c copy cuts on keyframes, so the start can land up to ~2s early. Re-cut with"
+  echo "      compress if you need the range frame-exact."
+}
+
 cmd_split() {
   local in="$1" chunk_mb="${2:-28}" dur size chunk_secs base
   [ -f "$in" ] || die "no such file: $in"
@@ -92,8 +135,10 @@ cmd_join() {
 }
 
 case "${1:-}" in
+  proxy)    shift; cmd_proxy "$@" ;;
+  cut)      shift; cmd_cut "$@" ;;
   compress) shift; cmd_compress "$@" ;;
   split)    shift; cmd_split "$@" ;;
   join)     shift; cmd_join "$@" ;;
-  *) sed -n '2,14p' "$0" | sed 's/^# \{0,1\}//'; exit 1 ;;
+  *) sed -n '2,20p' "$0" | sed 's/^# \{0,1\}//'; exit 1 ;;
 esac
