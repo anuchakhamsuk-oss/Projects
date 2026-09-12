@@ -1,1 +1,7 @@
 node_modules/
+
+# Secrets. The Viral Radar proxy reads SCRAPE_CREATORS_API_KEY from here and the
+# key must never reach a commit, so this entry goes in before the code that uses it.
+.env
+.env.*
+!.env.example

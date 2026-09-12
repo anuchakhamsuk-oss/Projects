@@ -66,3 +66,39 @@ scripts/align-script.cjs raw.mp4 --manifest shoot.json --shot 1 # time the known
 `align-script.cjs` does not transcribe. It finds where speech actually sits in
 the audio and places the already-written lines against it, so the captions land
 on real speech rather than on a guess.
+
+## Viral Radar (TikTok)
+
+Search TikTok by keyword through Scrape Creators, without the browser ever
+holding the API key or addressing the provider.
+
+```bash
+cp .env.example .env        # then put your key in SCRAPE_CREATORS_API_KEY
+set -a; . ./.env; set +a
+node scripts/viral-radar/server.cjs
+# http://127.0.0.1:8787
+```
+
+`.env` is gitignored. The key is read only by `scripts/viral-radar/scrape-creators.cjs`,
+the single module that talks to the provider; the page calls
+`/api/viral-radar/search` on its own origin and receives a normalized model
+(`id`, `platform`, `creator`, `caption`, `thumbnailUrl`, `videoUrl`, `stats`,
+`publishedAt`, `durationSec`, `nextCursor`) built field by field — the upstream
+body is never passed through.
+
+Bound to `127.0.0.1` deliberately: there is no authentication, so anything that
+can reach the port can spend the API quota.
+
+```bash
+node --test scripts/viral-radar/test.cjs
+```
+
+The tests run on fixtures and an injected fetch — no network, no key. They cover
+the data model, that the key never reaches a response (even when a fake upstream
+reflects it back), that invalid input costs no upstream call, and that only one
+module reads the key.
+
+The provider's live endpoint could not be reached from the environment this was
+written in, so the response mapping is a set of candidate field paths rather
+than one fixed shape. If real data disagrees, point `VIRAL_RADAR_FIELD_MAP` at a
+JSON file naming just the fields that are wrong — see `.env.example`.

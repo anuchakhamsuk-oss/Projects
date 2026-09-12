@@ -1,0 +1,20 @@
+{
+  "data": {
+    "videos": [
+      {
+        "id": "alt-1",
+        "caption": "alternative response layout",
+        "published_at": "2026-09-01T08:30:00Z",
+        "creator": { "handle": "alt_creator", "name": "Alt Creator" },
+        "views": 777,
+        "likes": 66,
+        "comments": 5,
+        "shares": 1,
+        "duration": 42,
+        "thumbnail": "https://example.invalid/alt.jpg",
+        "url": "https://www.tiktok.com/@alt_creator/video/alt-1"
+      }
+    ],
+    "cursor": "ALT_CURSOR_2"
+  }
+}

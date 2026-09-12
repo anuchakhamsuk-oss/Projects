@@ -1,0 +1,27 @@
+{
+  "status": "ok",
+  "max_cursor": "CURSOR_PAGE_2",
+  "has_more": true,
+  "aweme_list": [
+    {
+      "aweme_id": "7300000000000000001",
+      "desc": "ทำ automation ด้วย n8n ใน 3 นาที",
+      "create_time": 1757000000,
+      "author": { "unique_id": "demo_creator", "nickname": "Demo Creator" },
+      "statistics": { "play_count": 128000, "digg_count": 9400, "comment_count": 212, "share_count": 87 },
+      "video": {
+        "duration": 34000,
+        "cover": { "url_list": ["https://example.invalid/cover1.jpg"] }
+      },
+      "share_url": "https://www.tiktok.com/@demo_creator/video/7300000000000000001"
+    },
+    {
+      "aweme_id": "7300000000000000002",
+      "desc": "เว็บ 3D ทำยังไงให้ลื่น",
+      "create_time": 1756800000,
+      "author": { "unique_id": "second_demo", "nickname": "Second Demo" },
+      "statistics": { "play_count": 5300, "digg_count": 410, "comment_count": 18, "share_count": 4 },
+      "video": { "duration": 58000, "cover": { "url_list": ["https://example.invalid/cover2.jpg"] } }
+    }
+  ]
+}

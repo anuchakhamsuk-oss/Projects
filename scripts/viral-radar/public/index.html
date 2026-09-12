@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Viral Radar — TikTok</title>
+<style>
+  :root{
+    --bg:#f6f1e7; --surface:#fffdf8; --border:rgba(43,36,28,0.12); --border-strong:rgba(43,36,28,0.24);
+    --text:#2b241c; --dim:rgba(43,36,28,0.62); --faint:rgba(43,36,28,0.40);
+    --accent:#9c6b3e; --danger:#c1483a;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);
+       font:15px/1.5 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+  header{padding:22px 20px 6px;max-width:1100px;margin:0 auto}
+  h1{margin:0;font-size:22px;letter-spacing:-0.01em}
+  .sub{color:var(--dim);font-size:13px;margin-top:4px}
+  main{max-width:1100px;margin:0 auto;padding:16px 20px 60px}
+  form{display:flex;flex-wrap:wrap;gap:8px;align-items:end;
+       background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px}
+  .f{display:flex;flex-direction:column;gap:5px}
+  .f.grow{flex:1 1 240px;min-width:180px}
+  label{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--faint)}
+  input,select{font:inherit;color:inherit;background:#fff;border:1px solid var(--border);
+               border-radius:9px;padding:9px 11px;min-width:0}
+  input:focus,select:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:transparent}
+  button{font:inherit;font-weight:700;cursor:pointer;border-radius:999px;border:1px solid transparent;
+         background:var(--text);color:var(--surface);padding:10px 20px}
+  button:disabled{opacity:.45;cursor:default}
+  button.ghost{background:transparent;color:var(--text);border-color:var(--border-strong)}
+  .status{margin:16px 0 0;font-size:14px;color:var(--dim)}
+  .status.err{color:var(--danger)}
+  .grid{display:grid;gap:14px;margin-top:18px;
+        grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;
+        display:flex;flex-direction:column}
+  .thumb{aspect-ratio:9/16;background:#e7ded0;display:block;width:100%;object-fit:cover}
+  .thumb.ph{display:flex;align-items:center;justify-content:center;color:var(--faint);font-size:12px}
+  .body{padding:11px 12px 13px;display:flex;flex-direction:column;gap:7px;flex:1}
+  .who{font-weight:700;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .cap{font-size:13px;color:var(--dim);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;
+       overflow:hidden}
+  .stats{display:flex;flex-wrap:wrap;gap:9px;font-size:12px;color:var(--faint);
+         font-variant-numeric:tabular-nums;margin-top:auto}
+  .meta{display:flex;justify-content:space-between;gap:8px;font-size:11px;color:var(--faint)}
+  a.open{font-size:12px;font-weight:700;color:var(--accent);text-decoration:none}
+  a.open:hover{text-decoration:underline}
+  .more{display:flex;justify-content:center;margin-top:22px}
+  .note{margin-top:26px;font-size:12px;color:var(--faint);border-top:1px solid var(--border);padding-top:12px}
+</style>
+</head>
+<body>
+<header>
+  <h1>Viral Radar</h1>
+  <div class="sub">ค้นคลิป TikTok ด้วย keyword · เรียกผ่าน proxy บนเครื่องนี้ (API key อยู่ฝั่ง server เท่านั้น)</div>
+</header>
+
+<main>
+  <form id="form">
+    <div class="f grow">
+      <label for="query">Keyword</label>
+      <input id="query" name="query" placeholder="เช่น n8n automation" maxlength="100" required>
+    </div>
+    <div class="f">
+      <label for="period">ช่วงเวลา</label>
+      <select id="period" name="period">
+        <option value="">ทั้งหมด</option>
+        <option value="24h">24 ชม.</option>
+        <option value="7d" selected>7 วัน</option>
+        <option value="30d">30 วัน</option>
+        <option value="90d">90 วัน</option>
+        <option value="180d">180 วัน</option>
+      </select>
+    </div>
+    <div class="f">
+      <label for="sort">เรียงตาม</label>
+      <select id="sort" name="sort">
+        <option value="relevance" selected>ตรงที่สุด</option>
+        <option value="likes">ไลก์</option>
+        <option value="date">ใหม่สุด</option>
+      </select>
+    </div>
+    <div class="f">
+      <label for="region">ประเทศ</label>
+      <input id="region" name="region" value="TH" maxlength="2" size="3" pattern="[A-Za-z]{2}">
+    </div>
+    <button id="go" type="submit">ค้นหา</button>
+  </form>
+
+  <p class="status" id="status" hidden></p>
+  <div class="grid" id="grid"></div>
+  <div class="more"><button id="loadMore" class="ghost" type="button" hidden>โหลดเพิ่ม</button></div>
+
+  <p class="note">
+    หน้านี้คุยกับ <code>/api/viral-radar/search</code> บนเครื่องนี้เท่านั้น ไม่ได้ต่อ
+    <code>api.scrapecreators.com</code> โดยตรง และไม่เคยเห็น API key
+  </p>
+</main>
+
+<script>
+(function(){
+  'use strict';
+  var form = document.getElementById('form');
+  var grid = document.getElementById('grid');
+  var statusEl = document.getElementById('status');
+  var goBtn = document.getElementById('go');
+  var moreBtn = document.getElementById('loadMore');
+  var nextCursor = null;
+  var lastParams = null;
+  var busy = false;
+
+  function setStatus(msg, isError){
+    statusEl.hidden = !msg;
+    statusEl.textContent = msg || '';
+    statusEl.className = 'status' + (isError ? ' err' : '');
+  }
+
+  var nf = new Intl.NumberFormat('th-TH', { notation:'compact', maximumFractionDigits:1 });
+  function num(n){ return typeof n === 'number' ? nf.format(n) : '—'; }
+
+  function when(iso){
+    if(!iso) return '';
+    var d = new Date(iso);
+    return isNaN(d.getTime()) ? '' : d.toLocaleDateString('th-TH', {year:'numeric', month:'short', day:'numeric'});
+  }
+
+  function dur(s){
+    if(!s) return '';
+    var m = Math.floor(s/60), r = s%60;
+    return m ? m + ':' + String(r).padStart(2,'0') : r + 's';
+  }
+
+  // Built with DOM calls rather than innerHTML: caption text is whatever a
+  // stranger typed on TikTok and must never be parsed as markup.
+  function card(item){
+    var el = document.createElement('article');
+    el.className = 'card';
+
+    if(item.thumbnailUrl){
+      var img = document.createElement('img');
+      img.className = 'thumb';
+      img.src = item.thumbnailUrl;
+      img.alt = '';
+      img.loading = 'lazy';
+      img.referrerPolicy = 'no-referrer';
+      img.addEventListener('error', function(){
+        var ph = document.createElement('div');
+        ph.className = 'thumb ph';
+        ph.textContent = 'ไม่มีภาพตัวอย่าง';
+        if(img.parentNode) img.parentNode.replaceChild(ph, img);
+      });
+      el.appendChild(img);
+    }else{
+      var ph0 = document.createElement('div');
+      ph0.className = 'thumb ph';
+      ph0.textContent = 'ไม่มีภาพตัวอย่าง';
+      el.appendChild(ph0);
+    }
+
+    var body = document.createElement('div');
+    body.className = 'body';
+
+    var who = document.createElement('div');
+    who.className = 'who';
+    who.textContent = item.creator && item.creator.handle ? '@' + item.creator.handle
+                     : (item.creator && item.creator.name) || 'ไม่ทราบชื่อ';
+    body.appendChild(who);
+
+    if(item.caption){
+      var cap = document.createElement('div');
+      cap.className = 'cap';
+      cap.textContent = item.caption;
+      body.appendChild(cap);
+    }
+
+    var stats = document.createElement('div');
+    stats.className = 'stats';
+    var s = item.stats || {};
+    [[' view', s.views], ['like', s.likes], ['comment', s.comments], ['share', s.shares]]
+      .forEach(function(pair){
+        var sp = document.createElement('span');
+        sp.textContent = num(pair[1]) + ' ' + pair[0];
+        stats.appendChild(sp);
+      });
+    body.appendChild(stats);
+
+    var meta = document.createElement('div');
+    meta.className = 'meta';
+    var left = document.createElement('span');
+    left.textContent = [when(item.publishedAt), dur(item.durationSec)].filter(Boolean).join(' · ');
+    meta.appendChild(left);
+    if(item.videoUrl){
+      var a = document.createElement('a');
+      a.className = 'open';
+      a.href = item.videoUrl;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      a.textContent = 'เปิดคลิป ↗';
+      meta.appendChild(a);
+    }
+    body.appendChild(meta);
+
+    el.appendChild(body);
+    return el;
+  }
+
+  async function run(params, append){
+    if(busy) return;
+    busy = true;
+    goBtn.disabled = true;
+    moreBtn.disabled = true;
+    setStatus(append ? 'กำลังโหลดเพิ่ม…' : 'กำลังค้นหา…');
+
+    try{
+      var res = await fetch('/api/viral-radar/search?' + params.toString());
+      var data = await res.json();
+
+      if(!res.ok){
+        var msg = (data && data.error && data.error.message) || 'ค้นหาไม่สำเร็จ';
+        var code = data && data.error && data.error.code;
+        if(code === 'missing_api_key') msg = 'ยังไม่ได้ตั้ง SCRAPE_CREATORS_API_KEY ที่ฝั่ง server';
+        setStatus(msg, true);
+        if(!append){ grid.replaceChildren(); moreBtn.hidden = true; }
+        return;
+      }
+
+      if(!append) grid.replaceChildren();
+      (data.items || []).forEach(function(item){ grid.appendChild(card(item)); });
+
+      nextCursor = data.nextCursor || null;
+      moreBtn.hidden = !nextCursor;
+
+      var total = grid.childElementCount;
+      setStatus(total ? 'พบ ' + total + ' คลิป' + (nextCursor ? ' (ยังมีต่อ)' : '') : 'ไม่พบคลิปที่ตรงกับคำค้นนี้');
+    }catch(err){
+      setStatus('ติดต่อ proxy ไม่ได้ — server ยังรันอยู่หรือเปล่า', true);
+    }finally{
+      busy = false;
+      goBtn.disabled = false;
+      moreBtn.disabled = false;
+    }
+  }
+
+  form.addEventListener('submit', function(ev){
+    ev.preventDefault();
+    var p = new URLSearchParams();
+    p.set('query', document.getElementById('query').value.trim());
+    ['period','sort','region'].forEach(function(id){
+      var v = document.getElementById(id).value.trim();
+      if(v) p.set(id, v);
+    });
+    lastParams = p;
+    nextCursor = null;
+    run(new URLSearchParams(p), false);
+  });
+
+  moreBtn.addEventListener('click', function(){
+    if(!nextCursor || !lastParams) return;
+    var p = new URLSearchParams(lastParams);
+    p.set('cursor', nextCursor);
+    run(p, true);
+  });
+})();
+</script>
+</body>
+</html>
