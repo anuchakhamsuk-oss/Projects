@@ -50,3 +50,19 @@ footage ends up sideways in a render.
 
 Files too big for chat can also be pushed to this repo directly (GitHub's own
 per-file limit is 100 MB) and read from the checkout.
+
+## Timing captions without transcription
+
+Thai speech-to-text is not available here, so the words for a caption track have
+to come from somewhere else. They already exist: the Content Director artifact
+holds the script, per shot. Its editing tab exports a shoot manifest — copy it
+into the chat with the footage, and:
+
+```bash
+scripts/cut-silence.sh raw.mp4                                  # drop the dead air
+scripts/align-script.cjs raw.mp4 --manifest shoot.json --shot 1 # time the known lines
+```
+
+`align-script.cjs` does not transcribe. It finds where speech actually sits in
+the audio and places the already-written lines against it, so the captions land
+on real speech rather than on a guess.
